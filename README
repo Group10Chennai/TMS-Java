@@ -1,0 +1,7 @@
+DB Changes
+Create tables:
+
+1) Modified Tables
+user_master
+1) add new columns : TMS_login_status, TMS_user_level
+	
