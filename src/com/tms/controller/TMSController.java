@@ -32,7 +32,7 @@ import com.tms.model.UserMaster;
 import com.tms.service.MySQLService;
 
 @Controller
-@RequestMapping("/api")
+@RequestMapping("/api/tms")
 public class TMSController {
 
 	@Autowired
@@ -1028,6 +1028,7 @@ public class TMSController {
 							tmsTire.setThreadDepth(threadDepth);
 							tmsTire.setCreatedBy(loginUser.getUserId());
 							tmsTire.setCreatedDateTime(new Date());
+							tmsTire.setUpdatedDateTime(new Date());
 							try {
 								if (sensorId == 0) {
 									tmsTire.setSensorId(0l);

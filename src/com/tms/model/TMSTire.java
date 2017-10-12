@@ -48,8 +48,7 @@ public class TMSTire {
 	@Column(name = "CreatedBy", columnDefinition = " int default 0 ", nullable = true)
 	private Long createdBy;
 
-	@Column(name = "UpdatedDateTime",
-			columnDefinition = " TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+	@Column(name = "UpdatedDateTime", columnDefinition = " TIMESTAMP default CURRENT_TIMESTAMP")
 	private Date updatedDateTime;
 
 	@Column(name = "CreatedDateTime", columnDefinition = " TIMESTAMP default CURRENT_TIMESTAMP ", nullable = false)

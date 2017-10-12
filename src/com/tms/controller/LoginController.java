@@ -37,9 +37,6 @@ public class LoginController {
 	private Response processLogin(String username, String password, String securitycode, String loginVia,
 			HttpServletRequest request, HttpServletResponse response) {
 		CommonClass.fixInitialHeaders(request, response);
-		System.out.println("Login1: " + request.getSession(false).getId());
-		System.out.println("Login2: " + request.getSession(false).getLastAccessedTime());
-		System.out.println("Login3: " + request.getSession(false).getMaxInactiveInterval());
 		Response loginRes = new Response();
 		loginRes.setStatus(false);
 		try {
@@ -54,7 +51,7 @@ public class LoginController {
 				loginRes.setDisplayMsg(MyConstants.SECURITY_CODE_BLANK);
 				loginRes.setErrorMsg(securitycode + " - " + MyConstants.SECURITY_CODE_BLANK);
 			} else {
-				HttpSession session = request.getSession(false);
+				HttpSession session = request.getSession(true);
 				if (session != null) {
 					if (session.isNew() && (null == loginVia || loginVia.equalsIgnoreCase("web"))){
 						session.invalidate();
@@ -124,22 +121,15 @@ public class LoginController {
 		return loginRes;
 	}
 
-	@RequestMapping(value = "/logout", method = RequestMethod.GET)
-	public @ResponseBody Response logout(HttpServletRequest request, HttpServletResponse res) {
+	private Response processLogout(HttpServletRequest request, HttpServletResponse res) {
 		CommonClass.fixInitialHeaders(request, res);
 		Response response = new Response();
 		response.setStatus(true);
 		response.setDisplayMsg("User log out successfully");
-		System.out.println("Logout1: " + request.getSession(false).getId());
-		System.out.println("Logout2: " + request.getSession(false).getLastAccessedTime());
-		System.out.println("Logout3: " + request.getSession(false).getMaxInactiveInterval());
 
 		try {
 			HttpSession session = request.getSession(false);
 			session.invalidate();
-			System.out.println("Logout 11: " + request.getSession(false).getId());
-			System.out.println("Logout 22: " + request.getSession(false).getLastAccessedTime());
-			System.out.println("Logout 33: " + request.getSession(false).getMaxInactiveInterval());
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.setStatus(false);
@@ -147,14 +137,20 @@ public class LoginController {
 		}
 		return response;
 	}
+	
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	public @ResponseBody Response logoutGet(HttpServletRequest request, HttpServletResponse res) {
+		return processLogout(request, res);
+	}
+	
+	@RequestMapping(value = "/logout", method = RequestMethod.POST)
+	public @ResponseBody Response logoutPost(HttpServletRequest request, HttpServletResponse res) {
+		return processLogout(request, res);
+	}
 
 	@RequestMapping(value = "/captcha-image", method = RequestMethod.GET)
 	public @ResponseBody Response captchaImage(HttpServletRequest request, HttpServletResponse res) {
 		CommonClass.fixHeaders(request, res);
-
-		System.out.println("captcha1: " + request.getSession().getId());
-		System.out.println("captcha2: " + request.getSession().getLastAccessedTime());
-		System.out.println("captcha3: " + request.getSession().getMaxInactiveInterval());
 
 		Response response = new Response();
 		response.setStatus(true);
@@ -213,7 +209,6 @@ public class LoginController {
 			 */
 			// g2dImage.dispose();
 			HttpSession session = request.getSession();
-			System.out.println("sec code: " + sImageCode);
 			session.setAttribute("dns_security_code", sImageCode);
 		} catch (Exception e) {
 			e.printStackTrace();

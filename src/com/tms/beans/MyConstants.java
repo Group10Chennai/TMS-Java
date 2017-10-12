@@ -43,6 +43,8 @@ public class MyConstants {
 	public static String TREAD_DEPTH_LOCATION2_REQUIRED = "Tread Depth Location2 required";
 	public static String TREAD_DEPTH_LOCATION3_REQUIRED = "Tread Depth Location3 required";
 	
+	public static String TREAD_DEPTH_REQUIRED = "Tread depth required at 3 different locations.";
+	
 	public static String TIRE_PRESSURE_REQUIRED = "Tire pressure required";
 	
 	// Add, Update and Deletion of vehicle
@@ -134,6 +136,8 @@ public class MyConstants {
 	public static String TIREID_REQUIRED = "tireId is required";
 	public static String TIREPOSITION_REQUIRED = "Tire position is required";
 	public static String THREAD_DEPTH_REQUIRED = "Thread Depth is required";
+	
+	public static String TIRE_EXISTS_IN_THIS_POSITION = "Already exists in this position.";
 	
 	public static String ASSIGN_SENSOR= "Please assign a sensor to Tire first then assign tire to vehicle.";
 

@@ -43,9 +43,9 @@ import com.tms.model.UserMaster;
 import com.tms.service.MySQLService;
 
 @Controller
-@RequestMapping("/api")
+@RequestMapping("/api/tms")
 public class TMSActionController {
-	
+
 	private static final Logger logr = Logger.getLogger(TMSActionController.class);
 
 	@Autowired
@@ -80,73 +80,79 @@ public class TMSActionController {
 	}
 
 	// Get vehicle details based on limit (GET)
-//	@RequestMapping(value = "/getVehicles", method = RequestMethod.GET)
-//	public @ResponseBody Response getVehiclesList(HttpServletRequest request, HttpServletResponse resp) {
-//		Response response = new Response();
-//		response.setStatus(false);
-//		System.out.println("<<<<<<<<<<<<<<<<<< >>>>>>>>>>>>>>>>>>");
-//		try {
-//			HttpSession session = request.getSession(false);
-//			if (null != session && session.isNew() == false) {
-//				UserMaster loginUser = (UserMaster) session.getAttribute("LoginUser");
-//				if (loginUser != null) {
-//					CommonClass.fixHeaders(request, resp);
-//					List<TMSUserVehiclesView> vehiclesList = new ArrayList<>();
-//					// Checking search condition based on vehIds
-//					if (!(String.valueOf(request.getParameter("RequestParam")).equalsIgnoreCase(null)
-//							|| String.valueOf(request.getParameter("RequestParam")).equalsIgnoreCase("null"))) {
-//
-//						JSONObject reqObj = new JSONObject(request.getParameter("RequestParam"));
-//						JSONArray jsonVehIds = reqObj.getJSONArray("vehIds");
-//						// Get vehicle details
-//						List<Long> vehIds = new ArrayList<>(jsonVehIds.length());
-//						for (int i = 0; i < jsonVehIds.length(); i++) {
-//							vehIds.add(Long.parseLong(jsonVehIds.getString(i)));
-//						}
-//						vehiclesList = mySQLService.getVehiclesByVehIds(vehIds, loginUser.getUserId());
-////						for (TMSUserVehiclesView vehicle : vehiclesList) {
-////							List<TMSTire> tires = mySQLService.getTiresByVehId(vehicle.getVehId());
-////							vehicle.setTires(tires);
-////						}
-//					} else {
-//						Integer limit = 50;
-//						Integer startIndex = 0;
-//						if (null != request.getParameter("limit")) {
-//							limit = Integer.valueOf(request.getParameter("limit"));
-//						}
-//						if (null != request.getParameter("startIndex")) {
-//							startIndex = Integer.valueOf(request.getParameter("startIndex"));
-//						}
-//						vehiclesList = mySQLService.getVehiclesByLimit(loginUser.getUserId(), limit, startIndex);
-////						for (TMSUserVehiclesView vehicle : vehiclesList) {
-////							List<TMSTire> tires = mySQLService.getTiresByVehId(vehicle.getVehId());
-////							vehicle.setTires(tires);
-////						}
-//					}
-//					response.setResult(vehiclesList);
-//					response.setStatus(true);
-//				} else {
-//					// Session expired
-//					CommonClass.fixInitialHeaders(request, resp);
-//					response.setStatus(false);
-//					response.setDisplayMsg(MyConstants.SESSION_EXPIRED);
-//					response.setErrorMsg(MyConstants.SESSION_EXPIRED);
-//				}
-//			} else {
-//				// Session expired
-//				CommonClass.fixInitialHeaders(request, resp);
-//				response.setStatus(false);
-//				response.setDisplayMsg(MyConstants.SESSION_EXPIRED);
-//				response.setErrorMsg(MyConstants.SESSION_EXPIRED);
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			response.setStatus(false);
-//			response.setDisplayMsg(MyConstants.UNABLE_TO_PROCESS_REQUEST);
-//			response.setErrorMsg(e.getMessage());
-//		}
-//		return response;
-//	}
+	// @RequestMapping(value = "/getVehicles", method = RequestMethod.GET)
+	// public @ResponseBody Response getVehiclesList(HttpServletRequest request,
+	// HttpServletResponse resp) {
+	// Response response = new Response();
+	// response.setStatus(false);
+	// System.out.println("<<<<<<<<<<<<<<<<<< >>>>>>>>>>>>>>>>>>");
+	// try {
+	// HttpSession session = request.getSession(false);
+	// if (null != session && session.isNew() == false) {
+	// UserMaster loginUser = (UserMaster) session.getAttribute("LoginUser");
+	// if (loginUser != null) {
+	// CommonClass.fixHeaders(request, resp);
+	// List<TMSUserVehiclesView> vehiclesList = new ArrayList<>();
+	// // Checking search condition based on vehIds
+	// if
+	// (!(String.valueOf(request.getParameter("RequestParam")).equalsIgnoreCase(null)
+	// ||
+	// String.valueOf(request.getParameter("RequestParam")).equalsIgnoreCase("null")))
+	// {
+	//
+	// JSONObject reqObj = new JSONObject(request.getParameter("RequestParam"));
+	// JSONArray jsonVehIds = reqObj.getJSONArray("vehIds");
+	// // Get vehicle details
+	// List<Long> vehIds = new ArrayList<>(jsonVehIds.length());
+	// for (int i = 0; i < jsonVehIds.length(); i++) {
+	// vehIds.add(Long.parseLong(jsonVehIds.getString(i)));
+	// }
+	// vehiclesList = mySQLService.getVehiclesByVehIds(vehIds,
+	// loginUser.getUserId());
+	//// for (TMSUserVehiclesView vehicle : vehiclesList) {
+	//// List<TMSTire> tires = mySQLService.getTiresByVehId(vehicle.getVehId());
+	//// vehicle.setTires(tires);
+	//// }
+	// } else {
+	// Integer limit = 50;
+	// Integer startIndex = 0;
+	// if (null != request.getParameter("limit")) {
+	// limit = Integer.valueOf(request.getParameter("limit"));
+	// }
+	// if (null != request.getParameter("startIndex")) {
+	// startIndex = Integer.valueOf(request.getParameter("startIndex"));
+	// }
+	// vehiclesList = mySQLService.getVehiclesByLimit(loginUser.getUserId(),
+	// limit, startIndex);
+	//// for (TMSUserVehiclesView vehicle : vehiclesList) {
+	//// List<TMSTire> tires = mySQLService.getTiresByVehId(vehicle.getVehId());
+	//// vehicle.setTires(tires);
+	//// }
+	// }
+	// response.setResult(vehiclesList);
+	// response.setStatus(true);
+	// } else {
+	// // Session expired
+	// CommonClass.fixInitialHeaders(request, resp);
+	// response.setStatus(false);
+	// response.setDisplayMsg(MyConstants.SESSION_EXPIRED);
+	// response.setErrorMsg(MyConstants.SESSION_EXPIRED);
+	// }
+	// } else {
+	// // Session expired
+	// CommonClass.fixInitialHeaders(request, resp);
+	// response.setStatus(false);
+	// response.setDisplayMsg(MyConstants.SESSION_EXPIRED);
+	// response.setErrorMsg(MyConstants.SESSION_EXPIRED);
+	// }
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// response.setStatus(false);
+	// response.setDisplayMsg(MyConstants.UNABLE_TO_PROCESS_REQUEST);
+	// response.setErrorMsg(e.getMessage());
+	// }
+	// return response;
+	// }
 
 	// Get vehicle details based on limit or Vehicle ids (POST)
 	@RequestMapping(value = "/getVehicles", method = RequestMethod.POST)
@@ -434,6 +440,7 @@ public class TMSActionController {
 	}
 
 	// Assign Tires to Vehicle
+	// Not using
 	@RequestMapping(value = "/assignTyres", method = RequestMethod.GET)
 	public @ResponseBody Response assignTyresToVehicle(@RequestParam(value = "vehId", required = false) Integer vehId,
 			@RequestParam(value = "tyreId1", required = false) Integer tireId1,
@@ -685,6 +692,23 @@ public class TMSActionController {
 									response.setErrorMsg(fitmentDate + " - " + MyConstants.SERVICE_EXISTS_ON_FITTED_DATE
 											+ ": " + sdf.format(new Date(fitmentDate)));
 								} else {
+									// Find existing tire details if exists
+									// on the position
+									// If there then show the alert position
+									for (TMSTire existingTire : existingTires) {
+										if (existingTire.getTirePosition().equalsIgnoreCase(tirePosition)) {
+											response.setErrorMsg(MyConstants.TIRE_EXISTS_IN_THIS_POSITION);
+											response.setErrorMsg(tirePosition + " - "+MyConstants.TIRE_EXISTS_IN_THIS_POSITION);
+											response.setStatus(false);
+											return response;
+//											existingTire.setVehId(0l);
+//											existingTire.setTirePosition("");
+//											existingTire.setStatus(MyConstants.STATUS_INSTOCK);
+//											existingTire.setUpdatedDateTime(new Date());
+//											mySQLService.saveOrUpdateTire(existingTire);
+										}
+									}
+									
 									TMSTireService service = new TMSTireService();
 									service.setTireId(tireId);
 									service.setTireNumber(tire.getTireNumber());
@@ -703,18 +727,7 @@ public class TMSActionController {
 									response = mySQLService.saveOrUpdateTireServices(service);
 
 									if (response.isStatus()) {
-										// Find existing tire details if exists
-										// on the position
-										// If there then show the alert position
-										for (TMSTire existingTire : existingTires) {
-											if (existingTire.getTirePosition().equalsIgnoreCase(tirePosition)) {
-												existingTire.setVehId(0l);
-												existingTire.setTirePosition("");
-												existingTire.setStatus(MyConstants.STATUS_INSTOCK);
-												existingTire.setUpdatedDateTime(new Date());
-												mySQLService.saveOrUpdateTire(existingTire);
-											}
-										}
+										
 										TMSTire tireDetails = mySQLService.getTireByTireId(tireId);
 										tireDetails.setTirePosition(tirePosition);
 										tireDetails.setVehId(vehicleDetials.getVehId());
@@ -786,7 +799,11 @@ public class TMSActionController {
 			@RequestParam(value = "reason", required = false) String reason,
 			@RequestParam(value = "action", required = false) String action,
 			@RequestParam(value = "tyreCondition", required = false) String tyreCondition,
-			@RequestParam(value = "scrappedParty", required = false) String scrappedParty) {
+			@RequestParam(value = "scrappedParty", required = false) String scrappedParty,
+			@RequestParam(value = "depthLocation1", required = false) Double depthLocation1,
+			@RequestParam(value = "depthLocation2", required = false) Double depthLocation2,
+			@RequestParam(value = "depthLocation3", required = false) Double depthLocation3,
+			@RequestParam(value = "tirePressure", required = false) Double tirePressure) {
 
 		Response response = new Response();
 		response.setStatus(false);
@@ -832,6 +849,27 @@ public class TMSActionController {
 						TMSTire tire = mySQLService.getTireByTireId(tyreId);
 						if (null != tire) {
 							if (tire.getVehId() == vehId) {
+								boolean saveInspection = false;
+								if (null != depthLocation1 && depthLocation1 > 0
+										&& null != depthLocation2 && depthLocation2 > 0
+										&& null != depthLocation3 && depthLocation3 > 0) {
+									if (null != tirePressure && tirePressure > 0) {
+										saveInspection = true;
+									} else {
+										response.setDisplayMsg(MyConstants.TIRE_PRESSURE_REQUIRED);
+										response.setErrorMsg(
+												tirePressure + " - " + MyConstants.TIRE_PRESSURE_REQUIRED);
+										return response;
+									}
+								} else if ((null != depthLocation1 && depthLocation1 > 0)
+										|| (null != depthLocation2 && depthLocation2 > 0)
+										|| (null != depthLocation3 && depthLocation3 > 0)) {
+									response.setDisplayMsg(MyConstants.TREAD_DEPTH_REQUIRED);
+									response.setErrorMsg(depthLocation1 + " - " + depthLocation2 + " - "
+											+ depthLocation3 + " - " + MyConstants.TREAD_DEPTH_REQUIRED);
+									return response;
+								}
+
 								SimpleDateFormat sdf = new SimpleDateFormat(MyConstants.MYSQL_DATE_TIME_FORMATER);
 
 								List<TMSTireService> conditionService = mySQLService
@@ -857,6 +895,26 @@ public class TMSActionController {
 
 												response = mySQLService.saveOrUpdateTireServices(existingService);
 												if (response.isStatus()) {
+
+													// Response inspectionResp =
+													// null;
+													// Add new inspection
+													if (saveInspection) {
+														TMSTireInspection inspection = new TMSTireInspection();
+														inspection.setCreatedBy(loginUser.getUserId());
+														inspection.setCreatedByName(loginUser.getUserName());
+														inspection.setDepthLocation1(depthLocation1.toString());
+														inspection.setDepthLocation2(depthLocation2.toString());
+														inspection.setDepthLocation3(depthLocation3.toString());
+														inspection.setInspectionDate(new Date());
+														inspection.setKMSReading(removalKM);
+														inspection.setLocation(tire.getTirePosition());
+														inspection.setTireId(tire.getTireId());
+														inspection.setTireNumber(tire.getTireNumber());
+														inspection.setTirePressure(tirePressure.toString());
+														mySQLService.saveOrUpdateTireInspection(inspection);
+													}
+
 													// Deallocate tire and
 													// change
 													// the
@@ -866,7 +924,8 @@ public class TMSActionController {
 													tire.setLastServiceId(0l);
 													tire.setTotalTyreKM(tire.getTotalTyreKM()
 															+ (removalKM - existingService.getKmsAtTyreFitted()));
-
+													tire.setUpdatedDateTime(new Date());
+													
 													response = mySQLService.saveOrUpdateTire(tire);
 													if (response.isStatus()) {
 														response.setDisplayMsg(MyConstants.TIRE_DEALLOCATED_SUCCESS);
@@ -949,6 +1008,7 @@ public class TMSActionController {
 	}
 
 	// Get tire Inspection details
+	
 	@RequestMapping(value = "/Tire/getInspections", method = RequestMethod.GET)
 	public @ResponseBody Response getInspections(HttpServletRequest request,
 			@RequestParam(value = "limit", required = false) Integer limit,
@@ -998,6 +1058,7 @@ public class TMSActionController {
 	}
 
 	// Get tire service history detials
+	
 	@RequestMapping(value = "/Tire/getServices", method = RequestMethod.GET)
 	public @ResponseBody Response getServices(HttpServletRequest request,
 			@RequestParam(value = "limit", required = false) Integer limit,
@@ -1035,6 +1096,42 @@ public class TMSActionController {
 						List<TMSTireService> list = mySQLService.getTMSTireServices(0, 0, limit, startIndex);
 						response.setStatus(true);
 						response.setResult(list);
+					}
+				} else {
+					// Session expired
+					response.setDisplayMsg(MyConstants.SESSION_EXPIRED);
+					response.setErrorMsg(MyConstants.SESSION_EXPIRED);
+				}
+			} else {
+				// Session expired
+				response.setDisplayMsg(MyConstants.SESSION_EXPIRED);
+				response.setErrorMsg(MyConstants.SESSION_EXPIRED);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@RequestMapping(value = "/Tire/getServiceDetailsById", method = RequestMethod.GET)
+	public @ResponseBody Response getServiceById(HttpServletRequest request,
+			@RequestParam(value = "serviceId", required = false) Integer serviceId) {
+		Response response = new Response();
+		response.setStatus(false);
+		try {
+			HttpSession session = request.getSession(false);
+			if (null != session && session.isNew() == false) {
+				UserMaster loginUser = (UserMaster) session.getAttribute("LoginUser");
+				if (loginUser != null) {
+					if (null == serviceId || serviceId == 0) {
+						response.setDisplayMsg(MyConstants.INVALID_SERVICE_ID);
+						response.setErrorMsg(serviceId + " - " + MyConstants.INVALID_SERVICE_ID);
+					} else {
+						TMSTireService service = mySQLService.getTMSTireServiceById(serviceId);
+						List<TMSTireService> list = new ArrayList<>(1);
+						list.add(service);
+						response.setResult(list);
+						response.setStatus(true);
 					}
 				} else {
 					// Session expired

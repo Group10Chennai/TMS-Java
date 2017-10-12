@@ -36,7 +36,7 @@ public class NocacheFilter implements Filter {
         httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
         
         httpResponse.setHeader("Access-Control-Max-Age", "86400");
-        httpResponse.setHeader("SET-COOKIE", "JSESSIONID=" + httpRequest.getSession().getId());// + "; secure" + "; HttpOnly");
+//        httpResponse.setHeader("SET-COOKIE", "JSESSIONID=" + httpRequest.getSession().getId());// + "; secure" + "; HttpOnly");
         httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
         httpResponse.setHeader("Pragma", "no-cache"); // HTTP 1.0.
         
