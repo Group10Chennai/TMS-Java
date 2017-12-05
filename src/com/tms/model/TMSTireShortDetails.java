@@ -25,6 +25,9 @@ public class TMSTireShortDetails {
 	@Column(name = "Status")
 	private String status;
 	
+	@Column(name = "OrgId")
+	private Long orgId;
+	
 	public Long getTireId() {
 		return tireId;
 	}
@@ -43,6 +46,10 @@ public class TMSTireShortDetails {
 
 	public String getStatus() {
 		return status;
+	}
+
+	public Long getOrgId() {
+		return orgId;
 	}
 		
 }

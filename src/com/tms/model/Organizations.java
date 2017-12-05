@@ -30,9 +30,9 @@ public class Organizations {
 			columnDefinition = " TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
 	private Date updatedDateTime;
 	
-	@Column(name = "Status", columnDefinition = " int default 0 ", nullable = false)
+	@Column(name = "Status", columnDefinition = " int default 1 ", nullable = false)
 	private int status;
-	
+
 	public long getOrgId() {
 		return orgId;
 	}
@@ -65,14 +65,6 @@ public class Organizations {
 		this.createdDateTime = createdDateTime;
 	}
 
-	public int getStatus() {
-		return status;
-	}
-
-	public void setStatus(int status) {
-		this.status = status;
-	}
-
 	public Date getUpdatedDateTime() {
 		return updatedDateTime;
 	}
@@ -80,6 +72,15 @@ public class Organizations {
 	public void setUpdatedDateTime(Date updatedDateTime) {
 		this.updatedDateTime = updatedDateTime;
 	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+	
 	
 	
 }

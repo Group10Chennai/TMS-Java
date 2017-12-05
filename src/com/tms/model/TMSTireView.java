@@ -27,6 +27,9 @@ public class TMSTireView {
 	@Column(name = "TireType")
 	private String tireType;
 	
+	@Column(name = "TotalTyreKM")
+	private long totalTyreKM;
+	
 	@Column(name = "Status")
 	private String status;
 	
@@ -59,6 +62,9 @@ public class TMSTireView {
 	
 	@Column(name = "VehName")
 	private String vehName;
+	
+	@Column(name = "OrgId")
+	private Long orgId;
 	
 	@Column(name="Tire_CreatedDateTime")
 	private Date tireCreatedDateTime;
@@ -143,6 +149,14 @@ public class TMSTireView {
 
 	public String getTireType() {
 		return tireType;
+	}
+
+	public long getTotalTyreKM() {
+		return totalTyreKM;
+	}
+
+	public Long getOrgId() {
+		return orgId;
 	}
 
 }

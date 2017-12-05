@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.tms.beans.Response;
+import com.tms.beans.VehicleTyreCount;
 import com.tms.dao.MySQLDAO;
 import com.tms.model.TMSBController;
 import com.tms.model.TMSBasicVehicleDetails;
 import com.tms.model.TMSDepot;
+import com.tms.model.TMSMinMaxTempPressure;
 import com.tms.model.Organizations;
 import com.tms.model.TMSRFID;
 import com.tms.model.TMSSensor;
@@ -159,7 +161,7 @@ public class MySQLServiceImpl implements MySQLService {
 	}
 
 	@Override
-	public List<TMSUserVehiclesView> getVehicles() {
+	public List<TMSBasicVehicleDetails> getVehicles() {
 		
 		return mySQLDAO.getVehicles();
 	}
@@ -183,8 +185,8 @@ public class MySQLServiceImpl implements MySQLService {
 	}
 
 	@Override
-	public List<TMSTireView> getTireViewDetials(String status) {
-		return mySQLDAO.getTireViewDetials(status);
+	public List<TMSTireView> getTireViewDetials(long orgId, String status, int limit, int startIndex) {
+		return mySQLDAO.getTireViewDetials(orgId, status, limit, startIndex);
 	}
 
 	@Override
@@ -266,9 +268,9 @@ public class MySQLServiceImpl implements MySQLService {
 	}
 
 	@Override
-	public List<TMSTireInspection> getTMSTireInspections(long userId, int limit, int startIndex) {
+	public List<TMSTireInspection> getTMSTireInspections(long orgId, long userId, String searchWord, int limit, int startIndex) {
 		
-		return mySQLDAO.getTMSTireInspections(userId, limit, startIndex);
+		return mySQLDAO.getTMSTireInspections(orgId, userId, searchWord, limit, startIndex);
 	}
 
 	@Override
@@ -278,9 +280,9 @@ public class MySQLServiceImpl implements MySQLService {
 	}
 
 	@Override
-	public List<TMSTireShortDetails> getShortTireDetails() {
+	public List<TMSTireShortDetails> getShortTireDetails(long orgId, String status) {
 		
-		return mySQLDAO.getShortTireDetails();
+		return mySQLDAO.getShortTireDetails(orgId, status);
 	}
 
 	@Override
@@ -290,9 +292,9 @@ public class MySQLServiceImpl implements MySQLService {
 	}
 
 	@Override
-	public List<TMSTireService> getTMSTireServices(long orgId, long userId, int limit, int startIndex) {
+	public List<TMSTireService> getTMSTireServices(long orgId, long userId, String searchWord, int limit, int startIndex) {
 		
-		return mySQLDAO.getTMSTireServices(orgId, userId, limit, startIndex);
+		return mySQLDAO.getTMSTireServices(orgId, userId,searchWord, limit, startIndex);
 	}
 
 	@Override
@@ -362,9 +364,9 @@ public class MySQLServiceImpl implements MySQLService {
 	}
 
 	@Override
-	public List<TMSUserVehiclesView> searchVehicles(String searchWord, long userId) {
+	public Response searchVehicles(String searchWord, long userId, int limit, int startIndex) {
 		
-		return mySQLDAO.searchVehicles(searchWord, userId);
+		return mySQLDAO.searchVehicles(searchWord, userId, limit, startIndex);
 	}
 
 	@Override
@@ -392,9 +394,87 @@ public class MySQLServiceImpl implements MySQLService {
 	}
 
 	@Override
-	public long getVehiclesCountByUserId(long userId) {
+	public long getVehiclesCountByUserId(long userId, boolean uniqueVehs) {
 	
-		return mySQLDAO.getVehiclesCountByUserId(userId);
+		return mySQLDAO.getVehiclesCountByUserId(userId, uniqueVehs);
+	}
+
+	@Override
+	public long getTMSTireInspectionsCount(long orgId, long userId, String searchWord) {
+		
+		return mySQLDAO.getTMSTireInspectionsCount(orgId, userId, searchWord);
+	}
+
+	@Override
+	public TMSUserVehicleMapping getTMSUserVehicleMappingDetails(long vehId, long userId) {
+		
+		return mySQLDAO.getTMSUserVehicleMappingDetails(vehId, userId);
+	}
+
+	@Override
+	public List<TMSVehicles> getVehByVehIds(List<Long> vehIds) {
+		
+		return mySQLDAO.getVehByVehIds(vehIds);
+	}
+
+	@Override
+	public Response deallocateSensorFromTire(TMSTire tire, TMSSensor sensor) {
+		
+		return mySQLDAO.deallocateSensorFromTire(tire, sensor);
+	}
+
+	@Override
+	public long getTMSTireServicesCount(long orgId, long userId, String searchWord) {
+		
+		return mySQLDAO.getTMSTireServicesCount(orgId, userId, searchWord);
+	}
+
+	@Override
+	public List<TMSTireView> searchTires(String searchWord, long orgId, int limit, int startIndex) {
+		
+		return mySQLDAO.searchTires(searchWord, orgId, limit, startIndex);
+	}
+
+	@Override
+	public long getTMSTiresCount(long orgId, String status, String searchString) {
+		
+		return mySQLDAO.getTMSTiresCount(orgId, status, searchString);
+	}
+
+	@Override
+	public TMSMinMaxTempPressure getMinMaxTempPressureValues(long orgId, long userId) {
+		
+		return mySQLDAO.getMinMaxTempPressureValues(orgId, userId);
+	}
+
+	@Override
+	public Response getAllUserVehDetails(String searchWord, List<Long> vehIds, int limit, int startIndex) {
+		
+		return mySQLDAO.getAllUserVehDetails(searchWord, vehIds, limit, startIndex);
+	}
+
+	@Override
+	public List<VehicleTyreCount> findSemiAssignedVehCount(List<Long> vehIds) {
+		
+		return mySQLDAO.findSemiAssignedVehCount(vehIds);
+	}
+
+	@Override
+	public long getTireCountBasedOnStatus(String status, long orgId) {
+		
+		return mySQLDAO.getTireCountBasedOnStatus(status, orgId);
+	}
+
+	@Override
+	public long getTireServiceCount(long orgId) {
+		
+		return mySQLDAO.getTireServiceCount(orgId);
+	}
+	
+	@Override
+	public long getTireInspectionsCount(long orgId) {
+		
+		return mySQLDAO.getTireInspectionsCount(orgId);
 	}
 
 }

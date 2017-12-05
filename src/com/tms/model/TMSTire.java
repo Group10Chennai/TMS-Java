@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 @Entity
 @Table(name = "TMS_Tire")
@@ -59,6 +58,9 @@ public class TMSTire {
 	
 	@Column(name = "TotalTyreKM", columnDefinition = " int default 0 ", nullable = true)
 	private Long totalTyreKM;
+	
+	@Column(name = "OrgId", columnDefinition = " int default 0 ", nullable = true)
+	private Long orgId;
 	
 	public Long getTireId() {
 		return tireId;
@@ -178,6 +180,31 @@ public class TMSTire {
 
 	public void setTotalTyreKM(Long totalTyreKM) {
 		this.totalTyreKM = totalTyreKM;
+	}
+
+	public Long getOrgId() {
+		return orgId;
+	}
+
+	public void setOrgId(Long orgId) {
+		this.orgId = orgId;
+	}
+
+	@Override
+	public String toString() {
+		return "TMSTire [tireId=" + tireId + ", tireNumber=" + tireNumber + ", tireMakeId=" + tireMakeId + ", tireType="
+				+ tireType + ", tirePosition=" + tirePosition + ", threadDepth=" + threadDepth + ", sensorId="
+				+ sensorId + ", status=" + status + ", vehId=" + vehId + ", depotId=" + depotId + ", createdBy="
+				+ createdBy + ", updatedDateTime=" + updatedDateTime + ", createdDateTime=" + createdDateTime
+				+ ", lastServiceId=" + lastServiceId + ", totalTyreKM=" + totalTyreKM + ", orgId=" + orgId
+				+ ", getTireId()=" + getTireId() + ", getTireNumber()=" + getTireNumber() + ", getTireMakeId()="
+				+ getTireMakeId() + ", getTirePosition()=" + getTirePosition() + ", getThreadDepth()="
+				+ getThreadDepth() + ", getSensorId()=" + getSensorId() + ", getStatus()=" + getStatus()
+				+ ", getVehId()=" + getVehId() + ", getDepotId()=" + getDepotId() + ", getCreatedBy()=" + getCreatedBy()
+				+ ", getCreatedDateTime()=" + getCreatedDateTime() + ", getUpdatedDateTime()=" + getUpdatedDateTime()
+				+ ", getTireType()=" + getTireType() + ", getLastServiceId()=" + getLastServiceId()
+				+ ", getTotalTyreKM()=" + getTotalTyreKM() + ", getOrgId()=" + getOrgId() + ", getClass()=" + getClass()
+				+ ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
 	}
 
 }

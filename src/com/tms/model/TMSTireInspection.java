@@ -32,17 +32,23 @@ public class TMSTireInspection {
 	@Column(name = "KMSReading", columnDefinition = " int default 0 ", nullable = false)
 	private Long KMSReading;
 	
-	@Column(name = "TreadDepthLocation1", columnDefinition = " VARCHAR(45) ", nullable = false)
-	private String depthLocation1;
+	@Column(name = "TreadDepthLocation1", columnDefinition = " Double default 0 ", nullable = false)
+	private Double depthLocation1;
 	
-	@Column(name = "TreadDepthLocation2", columnDefinition = " VARCHAR(45) ", nullable = false)
-	private String depthLocation2;
+	@Column(name = "TreadDepthLocation2", columnDefinition = " Double default 0 ", nullable = false)
+	private Double depthLocation2;
 	
-	@Column(name = "TreadDepthLocation3", columnDefinition = " VARCHAR(45) ", nullable = false)
-	private String depthLocation3;
+	@Column(name = "TreadDepthLocation3", columnDefinition = " Double default 0 ", nullable = false)
+	private Double depthLocation3;
 	
+	@Column(name = "AvgThreadDepth", columnDefinition = " Double default 0 ", nullable = false)
+	private double avgThreadDepth;
+
 	@Column(name = "TirePressure", columnDefinition = " VARCHAR(45) ", nullable = false)
 	private String tirePressure;
+	
+	@Column(name = "OrgId", columnDefinition = " int default 0 ", nullable = true)
+	private Long orgId;
 	
 	@Column(name = "CreatedBy", columnDefinition = " int default 0 ", nullable = true)
 	private Long createdBy;
@@ -54,6 +60,15 @@ public class TMSTireInspection {
 			columnDefinition = " TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
 	private Date updatedDateTime;
 
+	
+	public double getAvgThreadDepth() {
+		return avgThreadDepth;
+	}
+
+	public void setAvgThreadDepth(double avgThreadDepth) {
+		this.avgThreadDepth = avgThreadDepth;
+	}
+	
 	public Long getTireInspectionId() {
 		return tireInspectionId;
 	}
@@ -94,27 +109,27 @@ public class TMSTireInspection {
 		KMSReading = kMSReading;
 	}
 
-	public String getDepthLocation1() {
+	public Double getDepthLocation1() {
 		return depthLocation1;
 	}
 
-	public void setDepthLocation1(String depthLocation1) {
+	public void setDepthLocation1(Double depthLocation1) {
 		this.depthLocation1 = depthLocation1;
 	}
 
-	public String getDepthLocation2() {
+	public Double getDepthLocation2() {
 		return depthLocation2;
 	}
 
-	public void setDepthLocation2(String depthLocation2) {
+	public void setDepthLocation2(Double depthLocation2) {
 		this.depthLocation2 = depthLocation2;
 	}
 
-	public String getDepthLocation3() {
+	public Double getDepthLocation3() {
 		return depthLocation3;
 	}
 
-	public void setDepthLocation3(String depthLocation3) {
+	public void setDepthLocation3(Double depthLocation3) {
 		this.depthLocation3 = depthLocation3;
 	}
 
@@ -157,6 +172,15 @@ public class TMSTireInspection {
 	public void setUpdatedDateTime(Date updatedDateTime) {
 		this.updatedDateTime = updatedDateTime;
 	}
+
+	public Long getOrgId() {
+		return orgId;
+	}
+
+	public void setOrgId(Long orgId) {
+		this.orgId = orgId;
+	}
+ 
 
 	
 }

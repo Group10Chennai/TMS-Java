@@ -28,6 +28,13 @@ public class TMSBasicVehicleDetails {
 	private long status;
 
 
+	
+	@Override
+	public String toString() {
+		return "TMSBasicVehicleDetails [vehId=" + vehId + ", vehName=" + vehName + ", orgId=" + orgId + ", userId="
+				+ userId + ", status=" + status + "]";
+	}
+
 	public long getVehId() {
 		return vehId;
 	}

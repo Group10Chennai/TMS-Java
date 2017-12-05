@@ -4,9 +4,11 @@ import java.util.Date;
 import java.util.List;
 
 import com.tms.beans.Response;
+import com.tms.beans.VehicleTyreCount;
 import com.tms.model.TMSBController;
 import com.tms.model.TMSBasicVehicleDetails;
 import com.tms.model.TMSDepot;
+import com.tms.model.TMSMinMaxTempPressure;
 import com.tms.model.Organizations;
 import com.tms.model.TMSRFID;
 import com.tms.model.TMSSensor;
@@ -27,8 +29,18 @@ public interface MySQLDAO {
 
 	public List<UserMaster> getAllTMSUsersByUserIds(List<Long> userIds);
 	
+	public List<TMSTireView> searchTires(String searchWord, long orgId, int limit, int startIndex);
+	
+	public Response getAllUserVehDetails(String searchWord, List<Long> vehIds, int limit, int startIndex);
+	
+	public long getTireCountBasedOnStatus(String status, long orgId);
+	
+	public long getTireServiceCount(long orgId);
+	
+	public long getTireInspectionsCount(long orgId);
+	
 	// Add, Update & Delete Vehicles services
-	public List<TMSUserVehiclesView> getVehicles();
+	public List<TMSBasicVehicleDetails> getVehicles();
 
 	public List<TMSBasicVehicleDetails> getAllBasicVehDetials(long orgId);
 
@@ -40,7 +52,7 @@ public interface MySQLDAO {
 	
 	public List<TMSUserVehiclesView> getVehiclesByVehIds(List<Long> vehIds, long userId);
 
-	public List<TMSUserVehiclesView> searchVehicles(String searchWord, long userId);
+	public Response searchVehicles(String searchWord, long userId, int limit, int startIndex);
 
 	public List<TMSUserVehiclesView> getModifiedVehDetails(Date lastUpdatedDate);
 
@@ -49,14 +61,19 @@ public interface MySQLDAO {
 	public TMSVehicles getVehByName(String vehicleName);
 
 	public TMSVehicles getVehById(long vehicleId);
+	
+	public List<TMSVehicles> getVehByVehIds(List<Long> vehIds);
 
 	public Response deleteVehicle(TMSVehicles tmsVehicles);
 
+	// Assign Vehicle to User
 	public Response saveOrUpdateUserVehMapping(TMSUserVehicleMapping userVehMapping);
 
 	public List<TMSUserVehicleMapping> getVehicleIdsByUserId(long userId);
 	
-	public long getVehiclesCountByUserId(long userId);
+	public long getVehiclesCountByUserId(long userId, boolean uniqueVehs);
+	
+	public TMSUserVehicleMapping getTMSUserVehicleMappingDetails(long vehId, long userId);
 
 	// RFID details services
 	public List<TMSRFID> getRFID(String status);
@@ -84,7 +101,7 @@ public interface MySQLDAO {
 
 	public TMSBController getBCtrlByVehId(long vehId);
 
-	// Sensor details services
+	// Sensor
 	public List<TMSSensor> getSensors(String status, int limit, int startIndex);
 
 	public Response saveOrUpdateSensor(TMSSensor tmsSensor);
@@ -97,10 +114,11 @@ public interface MySQLDAO {
 
 	public Response deleteSensor(TMSSensor tmsSensor);
 
+	
 	// Tire details services
 	public List<TMSTire> getTiresByVehId(long vehId);
 
-	public List<TMSTireView> getTireViewDetials(String status);
+	public List<TMSTireView> getTireViewDetials(long orgId, String status, int limit, int startIndex);
 
 	public List<TMSTireView> getModifiedTiresDetails(Date lastUpdatedDate);
 
@@ -114,18 +132,26 @@ public interface MySQLDAO {
 
 	public Response deleteTire(TMSTire tmsTire);
 
-	public List<TMSTireShortDetails> getShortTireDetails();
+	public List<TMSTireShortDetails> getShortTireDetails(long orgId, String status);
 
+	public long getTMSTiresCount(long orgId, String status, String searchString);
+	
+	
 	// Tire Inspection
-	public List<TMSTireInspection> getTMSTireInspections(long userId, int limit, int startIndex);
+	public List<TMSTireInspection> getTMSTireInspections(long orgId, long userId, String searchWord, int limit, int startIndex);
 
 	public Response saveOrUpdateTireInspection(TMSTireInspection inspection);
 
 	public TMSTireInspection getTMSTireInspectionById(long inspectionId);
+	
+	public long getTMSTireInspectionsCount(long orgId, long userId, String searchWord);
 
+	
 	// Tire Service
-	public List<TMSTireService> getTMSTireServices(long orgId, long userId, int limit, int startIndex);
+	public List<TMSTireService> getTMSTireServices(long orgId, long userId, String searchWord, int limit, int startIndex);
 
+	public long getTMSTireServicesCount(long orgId, long userId, String searchWord);
+	
 	public Response saveOrUpdateTireServices(TMSTireService service);
 
 	public TMSTireService getTMSTireServiceById(long serviceId);
@@ -155,5 +181,12 @@ public interface MySQLDAO {
 
 	// TMS Users list
 	public List<UserMaster> getAllTMSUsersByOrgId(long orgId);
+	
+	//Other
+	public Response deallocateSensorFromTire(TMSTire tire, TMSSensor sensor);
+	
+	public TMSMinMaxTempPressure getMinMaxTempPressureValues(long orgId, long userId);
+	
+	public List<VehicleTyreCount> findSemiAssignedVehCount(List<Long> vehIds);
 
 }

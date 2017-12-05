@@ -23,7 +23,8 @@ public class TMSUserVehicleMapping {
 	@Column(name = "vehId", columnDefinition = " int default 0 ", nullable = true)
 	private long vehId;
 	
-	@Column(name = "status", columnDefinition = " int default 0 ", nullable = true)
+	// 1 - Enable, 0 - Disable
+	@Column(name = "status", columnDefinition = " int default 1 ", nullable = true)
 	private long status;
 	
 	@Column(name = "assignedBy", columnDefinition = " int default 0 ", nullable = true)

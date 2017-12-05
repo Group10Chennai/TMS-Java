@@ -50,11 +50,14 @@ public class TMSUserVehiclesView {
 	@Column(name = "Vehicle_CreatedDateTime")
 	private Date veh_CreatedDateTime;
 	
-	@Column(name = "status")
+	@Column(name = "Status")
 	private long status;
 	
-	@Column(name = "userId")
+	@Column(name = "UserId")
 	private long userId;
+	
+	@Column(name = "UserName")
+	private String userName;
 	
 	@Transient
 	private List<TMSTire> tires;
@@ -65,6 +68,14 @@ public class TMSUserVehiclesView {
 
 	public String getVehName() {
 		return vehName;
+	}
+
+	public long getDepotId() {
+		return depotId;
+	}
+
+	public long getOrgId() {
+		return orgId;
 	}
 
 	public long getRFID() {
@@ -81,22 +92,6 @@ public class TMSUserVehiclesView {
 
 	public String getControllerUID() {
 		return controllerUID;
-	}
-
-	public List<TMSTire> getTires() {
-		return tires;
-	}
-
-	public void setTires(List<TMSTire> tires) {
-		this.tires = tires;
-	}
-
-	public long getDepotId() {
-		return depotId;
-	}
-
-	public long getOrgId() {
-		return orgId;
 	}
 
 	public Date getRfid_UpdatedDateTime() {
@@ -122,6 +117,23 @@ public class TMSUserVehiclesView {
 	public long getUserId() {
 		return userId;
 	}
+
+	public List<TMSTire> getTires() {
+		return tires;
+	}
+
+	public void setTires(List<TMSTire> tires) {
+		this.tires = tires;
+	}
 	
+	public String getUserName() {
+		return userName;
+	}
+
+	@Override
+	public String toString() {
+		return "TMSUserVehiclesView [vehId=" + vehId + ", vehName=" + vehName + ", orgId=" + orgId + ", status="
+				+ status + ", userId=" + userId + ", userName=" + userName + "]";
+	}
 	
 }

@@ -1,23 +1,24 @@
 package com.tms.controller;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.RestTemplate;
 
 import com.tms.beans.MyConstants;
 import com.tms.beans.Response;
+import com.tms.dto.TMSDtoI;
 import com.tms.model.TMSBController;
 import com.tms.model.TMSDepot;
 import com.tms.model.Organizations;
@@ -31,27 +32,23 @@ import com.tms.model.TMSVehicles;
 import com.tms.model.UserMaster;
 import com.tms.service.MySQLService;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+
 @Controller
 @RequestMapping("/api/tms")
 public class TMSController {
 
 	@Autowired
 	private MySQLService mySQLService;
+	
+	@Autowired
+	private TMSDtoI tMSDtoI;
 
-	@RequestMapping(value = "/sample", method = RequestMethod.GET)
-	public @ResponseBody Response sample(HttpServletResponse response) {
+	static Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 
-		try {
-			final String uri = "http://54.169.176.130:8080/CANtrackerAnalysis/vehDetails?groupId=2";
-			System.out.println("sqlite.TMLDeviceUpdater.callDeviceDetailsAPI2() " + new Date());
-			RestTemplate restTemplate = new RestTemplate();
-			String result = restTemplate.getForObject(uri, String.class);
-
-			System.out.println(result);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+	static {
+		root.setLevel(Level.INFO);
 	}
 
 	@RequestMapping(value = "/Vehicle/Add", method = RequestMethod.GET)
@@ -92,6 +89,7 @@ public class TMSController {
 							tmsVehicles.setOrgId(loginUser.getOrgId());
 						} else
 							tmsVehicles.setOrgId(orgId);
+						
 						if (null != RFID && RFID != 0) {
 							// Check RFID exists or not
 							tmsRFID = mySQLService.getRFIDByRFID(RFID);
@@ -105,7 +103,6 @@ public class TMSController {
 								return response;
 							}
 						}
-						System.out.println("controllerId: " + controllerId);
 						if (null != controllerId && controllerId != 0) {
 							// Check Bluetooth Controller exists or not
 							bCtrl = mySQLService.getBCtrlByBCtrlId(controllerId);
@@ -175,6 +172,13 @@ public class TMSController {
 							response.setStatus(true);
 							response.setDisplayMsg(MyConstants.VEHICLE_ADDED_SUCCESSFULL);
 							response.setErrorMsg(MyConstants.VEHICLE_ADDED_SUCCESSFULL);
+							// Add this vehicle into session
+							
+							List<Long> vehIds = new ArrayList<>(1);
+							vehIds.add(userVehMapping.getVehId());
+							
+							tMSDtoI.getAndSetUserVehToSession(vehIds, mySQLService, session);
+							
 						} else {
 							// Error in vehicle insertion
 							response.setDisplayMsg(MyConstants.VEHICLE_ADDING_FAILED);
@@ -254,7 +258,11 @@ public class TMSController {
 							// Check RFID exists or not
 							tmsRFID = mySQLService.getRFIDByRFID(RFID);
 							if (null != tmsRFID)
-								existingVeh.setRFID(RFID);
+								if (tmsRFID.getVehId() == 0 || tmsRFID.getVehId() == existingVeh.getVehId())
+									existingVeh.setRFID(RFID);
+								else {
+									// RFID already assigned to other vehicle
+								}
 							else {
 								response.setStatus(false);
 								response.setDisplayMsg(MyConstants.RFID_NOT_EXISTS);
@@ -267,7 +275,12 @@ public class TMSController {
 							// Check Bluetooth Controller exists or not
 							bCtrl = mySQLService.getBCtrlByBCtrlId(controllerId);
 							if (null != bCtrl) {
-								existingVeh.setControllerId(controllerId);
+								if (bCtrl.getVehId() == 0 || bCtrl.getVehId() == existingVeh.getVehId())
+									existingVeh.setControllerId(controllerId);
+								else {
+									// Bluetooth controller is assigned to other
+									// vehicle
+								}
 							} else {
 								response.setStatus(false);
 								response.setDisplayMsg(MyConstants.BControllerId_NOT_EXISTS);
@@ -277,7 +290,6 @@ public class TMSController {
 						}
 
 						// Save the Vehicle details
-						existingVeh.setUpdatedDateTime(new Date());
 						response = mySQLService.saveOrUpdate(existingVeh);
 						if (response.isStatus()) {
 							// Vehicle details are inserted
@@ -460,7 +472,6 @@ public class TMSController {
 										if (response.isStatus()) {
 											btCtrl.setStatus(status);
 											btCtrl.setVehId(0);
-											btCtrl.setUpdatedDateTime(new Date());
 											mySQLService.saveOrUpdateBController(btCtrl);
 											if (response.isStatus()) {
 												response.setDisplayMsg(MyConstants.VEHICLE_UPDATED_SUCCESSFULL);
@@ -472,7 +483,8 @@ public class TMSController {
 										response.setDisplayMsg(controllerId + MyConstants.NOT_EXISTS);
 										response.setErrorMsg(controllerId + " - " + MyConstants.NOT_EXISTS);
 									}
-								} else {
+								}
+								if (null != RFID && RFID != 0 && RFID == veh.getRFID()) {
 									// Deallocate RFID
 									TMSRFID rfid = mySQLService.getRFIDByRFID(RFID);
 									if (null != rfid) {
@@ -481,7 +493,6 @@ public class TMSController {
 										if (response.isStatus()) {
 											rfid.setVehId(0);
 											rfid.setStatus(status);
-											rfid.setUpdatedDateTime(new Date());
 											response = mySQLService.saveOrUpdateRFID(rfid);
 											if (response.isStatus()) {
 												response.setStatus(true);
@@ -990,6 +1001,7 @@ public class TMSController {
 			@RequestParam(value = "tyreType", required = false) String tyreType,
 			@RequestParam(value = "depotId", required = false) Long depotId,
 			@RequestParam(value = "sensorId", required = false) Long sensorId,
+			@RequestParam(value = "orgId", required = false) Long orgId,
 			@RequestParam(value = "threadDepth", required = false) String threadDepth, HttpServletRequest request) {
 		Response response = new Response();
 		response.setStatus(false);
@@ -1020,6 +1032,18 @@ public class TMSController {
 						TMSTire tmsTire = mySQLService.getTireByTireNumber(tyreNumber);
 						TMSSensor sensor = null;
 						if (null == tmsTire) {
+							if (loginUser.getTMSUserLevel() < 5) {
+								// Sys Amdin
+								// Org id required
+								if (null == orgId || orgId == 0) {
+									response.setStatus(false);
+									response.setDisplayMsg(MyConstants.ORG_ID_REQUIRED);
+									response.setErrorMsg(orgId + " - " + MyConstants.ORG_ID_REQUIRED);
+									return response;
+								}
+							} else {
+								orgId = loginUser.getOrgId();
+							}
 							tmsTire = new TMSTire();
 							tmsTire.setTireNumber(tyreNumber);
 							tmsTire.setTireMakeId(tyreMakeId);
@@ -1029,6 +1053,7 @@ public class TMSController {
 							tmsTire.setCreatedBy(loginUser.getUserId());
 							tmsTire.setCreatedDateTime(new Date());
 							tmsTire.setUpdatedDateTime(new Date());
+							tmsTire.setOrgId(orgId);
 							try {
 								if (sensorId == 0) {
 									tmsTire.setSensorId(0l);
@@ -1043,6 +1068,10 @@ public class TMSController {
 
 							tmsTire.setStatus(MyConstants.STATUS_INSTOCK);
 							tmsTire.setUpdatedDateTime(new Date());
+							tmsTire.setVehId(0l);
+							tmsTire.setTotalTyreKM(0l);
+							tmsTire.setLastServiceId(0l);
+
 							response = mySQLService.saveOrUpdateTire(tmsTire);
 							if (response.isStatus()) {
 								try {
@@ -1052,7 +1081,6 @@ public class TMSController {
 										TMSSensor existingSensor = mySQLService.getSensorByTireId(tmsTire.getTireId());
 
 										if (null != existingSensor) {
-											System.out.println(existingSensor.getSensorUID());
 											existingSensor.setTireId(0);
 											existingSensor.setStatus(MyConstants.STATUS_INSTOCK);
 											existingSensor.setUpdatedDateTime(new Date());
@@ -1174,7 +1202,7 @@ public class TMSController {
 										return response;
 									}
 								}
-								tmsTire.setUpdatedDateTime(new Date());
+								// tmsTire.setUpdatedDateTime(new Date());
 								response = mySQLService.saveOrUpdateTire(tmsTire);
 								if (response.isStatus()) {
 									response.setDisplayMsg(MyConstants.TIRE_UPDATED_SUCCESSFULL);
@@ -1185,11 +1213,9 @@ public class TMSController {
 
 										// Find the existing sensor id and
 										// change the status to Stock
-										System.out.println(tmsTire.getTireId());
 										TMSSensor existingSensor = mySQLService.getSensorByTireId(tmsTire.getTireId());
 
 										if (null != existingSensor) {
-											System.out.println(existingSensor.getSensorUID());
 											existingSensor.setTireId(0);
 											existingSensor.setStatus(MyConstants.STATUS_INSTOCK);
 											existingSensor.setUpdatedDateTime(new Date());
@@ -1236,9 +1262,9 @@ public class TMSController {
 	public @ResponseBody Response AddTireInspection(@RequestParam(value = "tireId", required = false) Long tireId,
 			@RequestParam(value = "Location", required = false) String location,
 			@RequestParam(value = "KMSReading", required = false) Long KMSReading,
-			@RequestParam(value = "depthLocation1", required = false) String depthLocation1,
-			@RequestParam(value = "depthLocation2", required = false) String depthLocation2,
-			@RequestParam(value = "depthLocation3", required = false) String depthLocation3,
+			@RequestParam(value = "depthLocation1", required = false) Double depthLocation1,
+			@RequestParam(value = "depthLocation2", required = false) Double depthLocation2,
+			@RequestParam(value = "depthLocation3", required = false) Double depthLocation3,
 			@RequestParam(value = "tirePressure", required = false) String tirePressure, HttpServletRequest request) {
 		Response response = new Response();
 		response.setStatus(false);
@@ -1259,18 +1285,15 @@ public class TMSController {
 						// Please enter KMS Reading
 						response.setDisplayMsg(MyConstants.KMSREADING_REQUIRED);
 						response.setErrorMsg(KMSReading + " - " + MyConstants.KMSREADING_REQUIRED);
-					} else if (null == depthLocation1 || depthLocation1.equalsIgnoreCase("null")
-							|| depthLocation1.trim().length() < 1) {
+					} else if (null == depthLocation1) {
 						// Please enter Tread depth location 1
 						response.setDisplayMsg(MyConstants.TREAD_DEPTH_LOCATION1_REQUIRED);
 						response.setErrorMsg(depthLocation1 + "- " + MyConstants.TREAD_DEPTH_LOCATION1_REQUIRED);
-					} else if (null == depthLocation2 || depthLocation2.equalsIgnoreCase("null")
-							|| depthLocation2.trim().length() < 1) {
+					} else if (null == depthLocation2) {
 						// Please enter Tread depth location 2
 						response.setDisplayMsg(MyConstants.TREAD_DEPTH_LOCATION2_REQUIRED);
 						response.setErrorMsg(depthLocation2 + "- " + MyConstants.TREAD_DEPTH_LOCATION2_REQUIRED);
-					} else if (null == depthLocation3 || depthLocation3.equalsIgnoreCase("null")
-							|| depthLocation3.trim().length() < 1) {
+					} else if (null == depthLocation3) {
 						// Please enter Tread depth location 3
 						response.setDisplayMsg(MyConstants.TREAD_DEPTH_LOCATION3_REQUIRED);
 						response.setErrorMsg(depthLocation3 + "- " + MyConstants.TREAD_DEPTH_LOCATION3_REQUIRED);
@@ -1291,6 +1314,8 @@ public class TMSController {
 							inspection.setDepthLocation1(depthLocation1);
 							inspection.setDepthLocation2(depthLocation2);
 							inspection.setDepthLocation3(depthLocation3);
+							inspection.setAvgThreadDepth(
+									MyConstants.calculateAvgDepth(depthLocation1, depthLocation2, depthLocation3));
 							inspection.setInspectionDate(new Date());
 							inspection.setKMSReading(KMSReading);
 							inspection.setLocation(location);
@@ -1299,6 +1324,7 @@ public class TMSController {
 							inspection.setCreatedByName(loginUser.getUserName());
 							inspection.setTireNumber(tire.getTireNumber());
 							inspection.setUpdatedDateTime(new Date());
+							inspection.setOrgId(loginUser.getOrgId());
 							response = mySQLService.saveOrUpdateTireInspection(inspection);
 						}
 					}
@@ -1323,9 +1349,9 @@ public class TMSController {
 			@RequestParam(value = "inspectionId", required = false) Long inspectionId,
 			@RequestParam(value = "Location", required = false) String location,
 			@RequestParam(value = "KMSReading", required = false) Long KMSReading,
-			@RequestParam(value = "depthLocation1", required = false) String depthLocation1,
-			@RequestParam(value = "depthLocation2", required = false) String depthLocation2,
-			@RequestParam(value = "depthLocation3", required = false) String depthLocation3,
+			@RequestParam(value = "depthLocation1", required = false) Double depthLocation1,
+			@RequestParam(value = "depthLocation2", required = false) Double depthLocation2,
+			@RequestParam(value = "depthLocation3", required = false) Double depthLocation3,
 			@RequestParam(value = "tirePressure", required = false) String tirePressure, HttpServletRequest request) {
 		Response response = new Response();
 		response.setStatus(false);
@@ -1346,18 +1372,15 @@ public class TMSController {
 						// Please enter KMS Reading
 						response.setDisplayMsg(MyConstants.KMSREADING_REQUIRED);
 						response.setErrorMsg(KMSReading + " - " + MyConstants.KMSREADING_REQUIRED);
-					} else if (null == depthLocation1 || depthLocation1.equalsIgnoreCase("null")
-							|| depthLocation1.trim().length() < 1) {
+					} else if (null == depthLocation1) {
 						// Please enter Tread depth location 1
 						response.setDisplayMsg(MyConstants.TREAD_DEPTH_LOCATION1_REQUIRED);
 						response.setErrorMsg(depthLocation1 + "- " + MyConstants.TREAD_DEPTH_LOCATION1_REQUIRED);
-					} else if (null == depthLocation2 || depthLocation2.equalsIgnoreCase("null")
-							|| depthLocation2.trim().length() < 1) {
+					} else if (null == depthLocation2) {
 						// Please enter Tread depth location 2
 						response.setDisplayMsg(MyConstants.TREAD_DEPTH_LOCATION2_REQUIRED);
 						response.setErrorMsg(depthLocation2 + "- " + MyConstants.TREAD_DEPTH_LOCATION2_REQUIRED);
-					} else if (null == depthLocation3 || depthLocation3.equalsIgnoreCase("null")
-							|| depthLocation3.trim().length() < 1) {
+					} else if (null == depthLocation3) {
 						// Please enter Tread depth location 3
 						response.setDisplayMsg(MyConstants.TREAD_DEPTH_LOCATION3_REQUIRED);
 						response.setErrorMsg(depthLocation3 + "- " + MyConstants.TREAD_DEPTH_LOCATION3_REQUIRED);
@@ -1376,7 +1399,8 @@ public class TMSController {
 							existingInspection.setDepthLocation1(depthLocation1);
 							existingInspection.setDepthLocation2(depthLocation2);
 							existingInspection.setDepthLocation3(depthLocation3);
-							existingInspection.setInspectionDate(new Date());
+							existingInspection.setAvgThreadDepth(
+									MyConstants.calculateAvgDepth(depthLocation1, depthLocation2, depthLocation3));
 							existingInspection.setKMSReading(KMSReading);
 							existingInspection.setLocation(location);
 							existingInspection.setTirePressure(tirePressure);
@@ -1510,7 +1534,7 @@ public class TMSController {
 								// Check service exists on the removal date
 								List<TMSTireService> dateConditionServices = mySQLService
 										.getServicesBetweenDate(new Date(fittedDate), new Date(removalDate), tireId);
-								System.out.println(dateConditionServices.size());
+
 								if (dateConditionServices.size() == 0) {
 									TMSTireService service = new TMSTireService();
 
@@ -1549,9 +1573,8 @@ public class TMSController {
 								} else {
 									response.setDisplayMsg(MyConstants.SERVICE_EXISTS_ON_THESE_DATES + ": "
 											+ sdf.format(new Date(removalDate)));
-									response.setErrorMsg(
-											removalDate + " - " + MyConstants.SERVICE_EXISTS_ON_THESE_DATES + ": "
-													+ sdf.format(new Date(removalDate)));
+									response.setErrorMsg(removalDate + " - " + MyConstants.SERVICE_EXISTS_ON_THESE_DATES
+											+ ": " + sdf.format(new Date(removalDate)));
 								}
 								// } else {
 								// response.setDisplayMsg(MyConstants.SERVICE_EXISTS_ON_FITTED_DATE
@@ -1679,7 +1702,6 @@ public class TMSController {
 
 								service.setCreatedBy(loginUser.getUserId());
 								service.setCreatedByName(loginUser.getUserName());
-								service.setCreatedDate(new Date());
 								service.setUpdatedDateTime(new Date());
 								response = mySQLService.saveOrUpdateTireServices(service);
 								if (response.isStatus()) {
@@ -1776,7 +1798,7 @@ public class TMSController {
 							org.setOrgName(orgName);
 							org.setCreatedBy(loginUser.getUserId());
 							org.setCreatedDateTime(new Date());
-							org.setStatus(0);
+							org.setStatus(1);
 							org.setUpdatedDateTime(new Date());
 							response = mySQLService.saveOrUpdateOrg(org);
 						} else {
