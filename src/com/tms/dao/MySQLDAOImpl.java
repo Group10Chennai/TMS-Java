@@ -5,7 +5,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -638,58 +640,193 @@ public class MySQLDAOImpl implements MySQLDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<TMSRFID> getRFID(String status) {
-		List<TMSRFID> rfids = new ArrayList<>();
+	public Response getRFID(String status, String searchWord, int limit, int startIndex) {
+		Response resp = new Response();
 		try {
-			if (null != status) {
-				rfids = sessionFactory.getCurrentSession().createQuery("from TMSRFID where status=:status")
-						.setParameter("status", status).list();
-			} else {
-				rfids = sessionFactory.getCurrentSession().createQuery("from TMSRFID").list();
+			Query q = sessionFactory.getCurrentSession().createQuery("from TMSRFID order by createdDateTime desc ")
+					.setMaxResults(limit).setFirstResult(startIndex);
+			Query q1 = sessionFactory.getCurrentSession().createQuery("select count(*) from TMSRFID");
+
+			if (null != status && null != searchWord) {
+				q = sessionFactory.getCurrentSession()
+						.createQuery("from TMSRFID where status = :status and (RFIDUID like :searchWord "
+								+ "or status like :searchWord) order by createdDateTime desc ")
+						.setParameter("status", status).setParameter("searchWord", "%" + searchWord + "%")
+						.setMaxResults(limit).setFirstResult(startIndex);
+				q1 = sessionFactory.getCurrentSession()
+						.createQuery("select count(*) from TMSRFID where status = :status and "
+								+ "(RFIDUID like :searchWord or status like :searchWord)")
+						.setParameter("status", status).setParameter("searchWord", "%" + searchWord + "%");
+			} else if (null != status) {
+				// Used to assing bluetooth controller to vehicle // No limit
+				q = sessionFactory.getCurrentSession()
+						.createQuery("from TMSRFID where status=:status order by createdDateTime desc ")
+						.setParameter("status", status);
+				q1 = sessionFactory.getCurrentSession()
+						.createQuery("select count(*) from TMSRFID where " + "status=:status")
+						.setParameter("status", status);
+			} else if (null != searchWord) {
+				q = sessionFactory.getCurrentSession()
+						.createQuery("from TMSRFID where RFIDUID like :searchWord "
+								+ "or status like :searchWord order by createdDateTime desc ")
+						.setParameter("searchWord", "%" + searchWord + "%").setMaxResults(limit)
+						.setFirstResult(startIndex);
+				q1 = sessionFactory.getCurrentSession().createQuery(
+						"select count(*) from TMSRFID where RFIDUID like :searchWord " + "or status like :searchWord")
+						.setParameter("searchWord", "%" + searchWord + "%");
 			}
+			List<TMSRFID> rfids = q.list();
+			long rfuidCount = (long) q1.uniqueResult();
+			resp.setResult(rfids);
+			resp.setCount(rfuidCount);
+			resp.setStatus(true);
 		} catch (Exception e) {
 			e.printStackTrace();
+			resp.setStatus(false);
+			resp.setDisplayMsg(MyConstants.UNABLE_TO_PROCESS_REQUEST);
+			resp.setErrorMsg(e.getMessage());
 		}
-		return rfids;
+		return resp;
+		// List<TMSRFID> rfids = new ArrayList<>();
+		// try {
+		// if (null != status) {
+		// rfids = sessionFactory.getCurrentSession().createQuery("from TMSRFID
+		// where status=:status")
+		// .setParameter("status", status).list();
+		// } else {
+		// rfids = sessionFactory.getCurrentSession().createQuery("from
+		// TMSRFID").list();
+		// }
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		// return rfids;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<TMSBController> getBController(String status) {
-		List<TMSBController> bControllers = new ArrayList<>();
+	public Response getBController(String status, String searchWord, int limit, int startIndex) {
+		Response resp = new Response();
 		try {
-			if (null != status) {
-				bControllers = sessionFactory.getCurrentSession()
-						.createQuery("from TMSBController where status=:status").setParameter("status", status).list();
-			} else {
-				bControllers = sessionFactory.getCurrentSession().createQuery("from TMSBController").list();
+			Query q = sessionFactory.getCurrentSession()
+					.createQuery("from TMSBController order by createdDateTime desc").setMaxResults(limit)
+					.setFirstResult(startIndex);
+			Query q1 = sessionFactory.getCurrentSession().createQuery("select count(*) from TMSBController");
+			if (null != status && null != searchWord) {
+				q = sessionFactory.getCurrentSession()
+						.createQuery("from TMSBController where status = :status and (controllerUID like :searchWord "
+								+ "or status like :searchWord) order by createdDateTime desc ")
+						.setParameter("status", status).setParameter("searchWord", "%" + searchWord + "%")
+						.setMaxResults(limit).setFirstResult(startIndex);
+				q1 = sessionFactory.getCurrentSession()
+						.createQuery(
+								"select count(*) from TMSBController where status = :status and (controllerUID like :searchWord "
+										+ "or status like :searchWord)")
+						.setParameter("status", status).setParameter("searchWord", "%" + searchWord + "%");
+			} else if (null != status) {
+				// Used to assing bluetooth controller to vehicle // No limit
+				q = sessionFactory.getCurrentSession()
+						.createQuery("from TMSBController where status=:status order by createdDateTime desc ")
+						.setParameter("status", status);
+				q1 = sessionFactory.getCurrentSession()
+						.createQuery("select count(*) from TMSBController where status=:status")
+						.setParameter("status", status);
+			} else if (null != searchWord) {
+				q = sessionFactory.getCurrentSession()
+						.createQuery("from TMSBController where controllerUID like :searchWord "
+								+ "or status like :searchWord order by createdDateTime desc ")
+						.setParameter("searchWord", "%" + searchWord + "%").setMaxResults(limit)
+						.setFirstResult(startIndex);
+				q1 = sessionFactory.getCurrentSession()
+						.createQuery("select count(*) from TMSBController where controllerUID like :searchWord "
+								+ "or status like :searchWord")
+						.setParameter("searchWord", "%" + searchWord + "%");
 			}
-
+			List<TMSBController> bControllers = q.list();
+			long bCtrlCount = (long) q1.uniqueResult();
+			resp.setResult(bControllers);
+			resp.setCount(bCtrlCount);
+			resp.setStatus(true);
 		} catch (Exception e) {
 			e.printStackTrace();
+			resp.setStatus(false);
+			resp.setDisplayMsg(MyConstants.UNABLE_TO_PROCESS_REQUEST);
+			resp.setErrorMsg(e.getMessage());
 		}
-		return bControllers;
+		return resp;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<TMSSensor> getSensors(String status, int limit, int startIndex) {
-		List<TMSSensor> sensors = new ArrayList<>();
+	public Response getSensors(String status, String searchWord, int limit, int startIndex) {
+		// List<TMSSensor> sensors = new ArrayList<>();
+		Response resp = new Response();
 		try {
-			if (null != status) {
-				sensors = sessionFactory.getCurrentSession()
+			Query q = sessionFactory.getCurrentSession().createQuery("from TMSSensor order by createdDateTime desc ")
+					.setMaxResults(limit).setFirstResult(startIndex);
+			Query q1 = sessionFactory.getCurrentSession().createQuery("select count(*) from TMSSensor");
+			if (null != status && null != searchWord) {
+				q = sessionFactory.getCurrentSession()
+						.createQuery("from TMSSensor where status = :status and (sensorUID like :searchWord "
+								+ "or status like :searchWord) order by createdDateTime desc ")
+						.setParameter("status", status).setParameter("searchWord", "%" + searchWord + "%")
+						.setMaxResults(limit).setFirstResult(startIndex);
+				q1 = sessionFactory.getCurrentSession()
+						.createQuery(
+								"select count(*) from TMSSensor where status = :status and (sensorUID like :searchWord "
+										+ "or status like :searchWord)")
+						.setParameter("status", status).setParameter("searchWord", "%" + searchWord + "%");
+			} else if (null != status) {
+				// Used to assing sensor to tyre // No limit
+				q = sessionFactory.getCurrentSession()
 						.createQuery("from TMSSensor where status=:status order by createdDateTime desc ")
-						.setParameter("status", status).list();
-			} else {
-				sensors = sessionFactory.getCurrentSession()
-						.createQuery("from TMSSensor order by createdDateTime desc ").setMaxResults(limit)
-						.setFirstResult(startIndex).list();
+						.setParameter("status", status);
+				q1 = sessionFactory.getCurrentSession()
+						.createQuery("select count(*) from TMSSensor where status=:status")
+						.setParameter("status", status);
+			} else if (null != searchWord) {
+				q = sessionFactory.getCurrentSession()
+						.createQuery("from TMSSensor where sensorUID like :searchWord "
+								+ "or status like :searchWord order by createdDateTime desc ")
+						.setParameter("searchWord", "%" + searchWord + "%").setMaxResults(limit)
+						.setFirstResult(startIndex);
+				q1 = sessionFactory.getCurrentSession()
+						.createQuery("select count(*) from TMSSensor where sensorUID like :searchWord "
+								+ "or status like :searchWord")
+						.setParameter("searchWord", "%" + searchWord + "%");
 			}
+			List<TMSSensor> sensors = q.list();
+			long sensorCount = (long) q1.uniqueResult();
+			resp.setResult(sensors);
+			resp.setCount(sensorCount);
+			resp.setStatus(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			resp.setStatus(false);
+			resp.setDisplayMsg(MyConstants.UNABLE_TO_PROCESS_REQUEST);
+			resp.setErrorMsg(e.getMessage());
+		}
+		return resp;
+	}
 
+	@Override
+	public long getSensorsCount(String status) {
+		long sensorCount = 0;
+		try {
+			if (null != status) {
+				sensorCount = (long) sessionFactory.getCurrentSession()
+						.createQuery(
+								"select count(*) from TMSSensor where status=:status order by createdDateTime desc ")
+						.setParameter("status", status).uniqueResult();
+			} else {
+				sensorCount = (long) sessionFactory.getCurrentSession()
+						.createQuery("select count(*) from TMSSensor order by createdDateTime desc").uniqueResult();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return sensors;
+
+		return sensorCount;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -706,6 +843,12 @@ public class MySQLDAOImpl implements MySQLDAO {
 							.createQuery("from TMSTireView where status=:status "
 									+ "and sensorId != 0 order by Tire_CreatedDateTime desc")
 							.setParameter("status", status);
+				} else if (null != status && status.equalsIgnoreCase(MyConstants.STATUS_WITHOUT_SENSOR)) {
+					// Only InStock
+					q = sessionFactory.getCurrentSession()
+							.createQuery("from TMSTireView where status=:status "
+									+ "and sensorId = 0 order by Tire_CreatedDateTime desc")
+							.setParameter("status", MyConstants.STATUS_INSTOCK);
 				} else if (null != status) {
 					// Other than InStock
 					q = sessionFactory.getCurrentSession()
@@ -729,6 +872,13 @@ public class MySQLDAOImpl implements MySQLDAO {
 							.createQuery("from TMSTireView where status=:status and sensorId != 0 "
 									+ "and orgId = :orgId order by Tire_CreatedDateTime desc")
 							.setParameter("status", status).setLong("orgId", orgId);
+				} else if (null != status && status.equalsIgnoreCase(MyConstants.STATUS_WITHOUT_SENSOR)) {
+					// Only InStock
+
+					q = sessionFactory.getCurrentSession()
+							.createQuery("from TMSTireView where status=:status and sensorId = 0 "
+									+ "and orgId = :orgId order by Tire_CreatedDateTime desc")
+							.setParameter("status", MyConstants.STATUS_INSTOCK).setLong("orgId", orgId);
 				} else if (null != status) {
 					// Other than InStock
 					q = sessionFactory.getCurrentSession()
@@ -984,7 +1134,7 @@ public class MySQLDAOImpl implements MySQLDAO {
 				// Based on org
 				if (null != searchWord) {
 					q = sessionFactory.getCurrentSession()
-							.createQuery("from TMSTireInspection " + "where orgId=:orgId and "
+							.createQuery("from TMSTireInspection where orgId=:orgId and "
 									+ " (tireNumber like :searchWord or inspectionDate like :searchWord or"
 									+ " location like :searchWord or KMSReading like :searchWord or"
 									+ " tirePressure like :searchWord or updatedDateTime like :searchWord or"
@@ -999,17 +1149,17 @@ public class MySQLDAOImpl implements MySQLDAO {
 				// Based on user Id
 				if (null != searchWord) {
 					q = sessionFactory.getCurrentSession()
-							.createQuery("from TMSTireInspection " + "where createdBy = :createdBy and "
+							.createQuery("from TMSTireInspection where createdBy = :createdBy and "
 									+ " (tireNumber like :searchWord or inspectionDate like :searchWord or"
 									+ " location like :searchWord or KMSReading like :searchWord or"
 									+ " tirePressure like :searchWord or updatedDateTime like :searchWord or"
 									+ " avgThreadDepth like :searchWord) ORDER BY inspectionDate DESC")
 							.setParameter("createdBy", userId).setParameter("searchWord", "%" + searchWord + "%");
 				} else {
-					tireInspections = sessionFactory.getCurrentSession()
+					q = sessionFactory.getCurrentSession()
 							.createQuery(
-									"from TMSTireInspection where createdBy=:createdBy ORDER BY inspectionDate DESC")
-							.setParameter("createdBy", userId).list();
+									"from TMSTireInspection where createdBy = :createdBy ORDER BY inspectionDate DESC")
+							.setParameter("createdBy", userId);
 				}
 			} else {
 				// Only search for admin
@@ -1020,7 +1170,7 @@ public class MySQLDAOImpl implements MySQLDAO {
 									+ " location like :searchWord or KMSReading like :searchWord or"
 									+ " tirePressure like :searchWord or updatedDateTime like :searchWord or"
 									+ " avgThreadDepth like :searchWord) ORDER BY inspectionDate DESC")
-							.setParameter("createdBy", userId).setParameter("searchWord", "%" + searchWord + "%");
+							.setParameter("searchWord", "%" + searchWord + "%");
 				}
 			}
 			tireInspections = q.setMaxResults(limit).setFirstResult(startIndex).list();
@@ -1109,9 +1259,21 @@ public class MySQLDAOImpl implements MySQLDAO {
 									+ " tireType like :searchWord)")
 							.setParameter("searchWord", "%" + searchString + "%").setParameter("orgId", orgId);
 				} else if (null != status) {
-					q = sessionFactory.getCurrentSession()
-							.createQuery("select count(*) from TMSTireView where orgId=:orgId and status = :status")
-							.setParameter("status", status).setParameter("orgId", orgId);
+					if (status.equalsIgnoreCase(MyConstants.STATUS_INSTOCK)) {
+						q = sessionFactory.getCurrentSession()
+								.createQuery("select count(*) from TMSTireView "
+										+ "where orgId=:orgId and status = :status and sensorId != 0")
+								.setParameter("status", status).setParameter("orgId", orgId);
+					} else if (status.equalsIgnoreCase(MyConstants.STATUS_WITHOUT_SENSOR)) {
+						q = sessionFactory.getCurrentSession()
+								.createQuery("select count(*) from TMSTireView "
+										+ "where orgId=:orgId and status = :status and sensorId = 0")
+								.setParameter("status", MyConstants.STATUS_INSTOCK).setParameter("orgId", orgId);
+					} else {
+						q = sessionFactory.getCurrentSession()
+								.createQuery("select count(*) from TMSTireView where orgId=:orgId and status = :status")
+								.setParameter("status", status).setParameter("orgId", orgId);
+					}
 				} else {
 					q = sessionFactory.getCurrentSession()
 							.createQuery("select count(*) from TMSTireView where orgId=:orgId")
@@ -1130,9 +1292,21 @@ public class MySQLDAOImpl implements MySQLDAO {
 									+ " tireType like :searchWord)")
 							.setParameter("searchWord", "%" + searchString + "%").uniqueResult();
 				} else if (null != status) {
-					q = sessionFactory.getCurrentSession()
-							.createQuery("select count(*) from TMSTireView where status = :status")
-							.setParameter("status", status);
+					if (status.equalsIgnoreCase(MyConstants.STATUS_INSTOCK)) {
+						q = sessionFactory.getCurrentSession()
+								.createQuery("select count(*) from TMSTireView "
+										+ "where status = :status and sensorId != 0")
+								.setParameter("status", status);
+					} else if (status.equalsIgnoreCase(MyConstants.STATUS_WITHOUT_SENSOR)) {
+						q = sessionFactory.getCurrentSession()
+								.createQuery(
+										"select count(*) from TMSTireView " + "where status = :status and sensorId = 0")
+								.setParameter("status", MyConstants.STATUS_INSTOCK);
+					} else {
+						q = sessionFactory.getCurrentSession()
+								.createQuery("select count(*) from TMSTireView where status = :status")
+								.setParameter("status", status);
+					}
 				}
 			}
 			count = (long) q.uniqueResult();
@@ -1173,6 +1347,11 @@ public class MySQLDAOImpl implements MySQLDAO {
 							.createQuery("from TMSTireShortDetails where status = :status "
 									+ "and sensorId != 0 order by Tire_CreatedDateTime desc")
 							.setParameter("status", status);
+				} else if (null != status && status.equalsIgnoreCase(MyConstants.STATUS_WITHOUT_SENSOR)) {
+					q = sessionFactory.getCurrentSession()
+							.createQuery("from TMSTireShortDetails where status = :status "
+									+ "and sensorId = 0 order by Tire_CreatedDateTime desc")
+							.setParameter("status", MyConstants.STATUS_INSTOCK);
 				} else if (null != status) {
 					q = sessionFactory.getCurrentSession().createQuery(
 							"from TMSTireShortDetails where status = :status " + "order by Tire_CreatedDateTime desc")
@@ -1180,7 +1359,7 @@ public class MySQLDAOImpl implements MySQLDAO {
 				}
 				tireDetails = q.list();
 			} else {
-				// For perticular Org
+				// For particular Org
 				Query q = sessionFactory.getCurrentSession()
 						.createQuery(
 								"from TMSTireShortDetails where orgId = :orgId " + "order by Tire_CreatedDateTime desc")
@@ -1190,6 +1369,11 @@ public class MySQLDAOImpl implements MySQLDAO {
 							.createQuery("from TMSTireShortDetails where orgId = :orgId and status = :status "
 									+ "and sensorId != 0 order by Tire_CreatedDateTime desc")
 							.setParameter("orgId", orgId).setParameter("status", status);
+				} else if (null != status && status.equalsIgnoreCase(MyConstants.STATUS_WITHOUT_SENSOR)) {
+					q = sessionFactory.getCurrentSession()
+							.createQuery("from TMSTireShortDetails where orgId = :orgId and status = :status "
+									+ "and sensorId = 0 order by Tire_CreatedDateTime desc")
+							.setParameter("orgId", orgId).setParameter("status", MyConstants.STATUS_INSTOCK);
 				} else if (null != status) {
 					q = sessionFactory.getCurrentSession()
 							.createQuery("from TMSTireShortDetails where orgId = :orgId "
@@ -1603,6 +1787,56 @@ public class MySQLDAOImpl implements MySQLDAO {
 	}
 
 	@Override
+	public Response processServiceDetails(TMSTireService existingService, TMSTireInspection inspection, TMSTire tire) {
+		Response response = new Response();
+
+		try {
+			response = saveOrUpdateTireServices(existingService);
+			if (response.isStatus()) {
+				// Service saved successfully
+				if (null != inspection) {
+					response = saveOrUpdateTireInspection(inspection);
+					if (response.isStatus()) {
+						// Inspection saved successfully
+						response = saveOrUpdateTire(tire);
+						if (response.isStatus()) {
+							// Tire details saved successfully
+							response.setDisplayMsg(MyConstants.TIRE_DEALLOCATED_SUCCESS);
+							response.setErrorMsg(MyConstants.TIRE_DEALLOCATED_SUCCESS);
+							return response;
+						}
+					}
+				} else {
+					response = saveOrUpdateTire(tire);
+					if (response.isStatus()) {
+						response.setDisplayMsg(MyConstants.TIRE_DEALLOCATED_SUCCESS);
+						response.setErrorMsg(MyConstants.TIRE_DEALLOCATED_SUCCESS);
+						return response;
+					}
+				}
+			}
+			response.setStatus(false);
+			response.setDisplayMsg(MyConstants.TIRE_DEALLOCATED_FAILED);
+			response.setErrorMsg(MyConstants.TIRE_DEALLOCATED_FAILED);
+			// Rollback the last transaction
+			TransactionInterceptor.currentTransactionStatus().setRollbackOnly();
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setStatus(false);
+			response.setDisplayMsg(MyConstants.TIRE_DEALLOCATED_FAILED);
+			response.setErrorMsg(e.getMessage());
+			try {
+				// If there is any exception we are rollback the last
+				// transaction
+				TransactionInterceptor.currentTransactionStatus().setRollbackOnly();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+		return response;
+	}
+
+	@Override
 	public Response deallocateSensorFromTire(TMSTire tire, TMSSensor sensor) {
 
 		Response response = new Response();
@@ -1679,15 +1913,15 @@ public class MySQLDAOImpl implements MySQLDAO {
 		try {
 			if (null != searchWord) {
 				userVehDetails = sessionFactory.getCurrentSession()
-						.createQuery("from TMSUserVehiclesView_CompositeKey where vehName = :searchWord "
-								+ "or userName = :searchWord ORDER BY veh_CreatedDateTime DESC")
+						.createQuery("from TMSUserVehiclesView_CompositeKey where vehName like :searchWord "
+								+ "or userName like :searchWord ORDER BY veh_CreatedDateTime DESC")
 						.setParameter("searchWord", "%" + searchWord + "%").setMaxResults(limit)
 						.setFirstResult(startIndex).list();
 				response.setResult(userVehDetails);
 
 				long count = (long) sessionFactory.getCurrentSession()
 						.createQuery("select count(*) from TMSUserVehiclesView_CompositeKey "
-								+ "where vehName = :searchWord or userName = :searchWord ")
+								+ "where vehName like :searchWord or userName like :searchWord ")
 						.setParameter("searchWord", "%" + searchWord + "%").uniqueResult();
 				response.setCount(count);
 			} else if (null != vehIds && vehIds.size() > 0) {
@@ -1754,18 +1988,21 @@ public class MySQLDAOImpl implements MySQLDAO {
 	public List<VehicleTyreCount> findSemiAssignedVehCount(List<Long> vehIds) {
 		List<VehicleTyreCount> vehTyreCount = new ArrayList<>();
 		try {
-			List<Object[]> rows = sessionFactory.getCurrentSession()
-					.createQuery("SELECT vehId, count(*) FROM TMSTire WHERE vehId in :vehIds GROUP BY vehId")
-					.setParameterList("vehIds", vehIds).list();
-
-			for (Object[] row : rows) {
-				try {
-					VehicleTyreCount tyreCount = new VehicleTyreCount();
-					tyreCount.setVehId(Integer.parseInt(row[0].toString()));
-					tyreCount.setTireCount(Integer.parseInt(row[1].toString()));
-					vehTyreCount.add(tyreCount);
-				} catch (Exception e) {
-					e.printStackTrace();
+			if (null != vehIds && vehIds.size() > 0) {
+				List<Object[]> rows = new ArrayList<>();
+				if ((rows = sessionFactory.getCurrentSession()
+						.createQuery("SELECT vehId, count(*) FROM TMSTire WHERE vehId in :vehIds GROUP BY vehId")
+						.setParameterList("vehIds", vehIds).list()) != null) {
+					for (Object[] row : rows) {
+						try {
+							VehicleTyreCount tyreCount = new VehicleTyreCount();
+							tyreCount.setVehId(Integer.parseInt(row[0].toString()));
+							tyreCount.setTireCount(Integer.parseInt(row[1].toString()));
+							vehTyreCount.add(tyreCount);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -1776,22 +2013,61 @@ public class MySQLDAOImpl implements MySQLDAO {
 	}
 
 	@Override
-	public long getTireCountBasedOnStatus(String status, long orgId) {
+	public long getTireCountBasedOnStatus(String status, boolean sensorStatus, long orgId) {
 
 		try {
-			if (null != status) {
-				// For Org based on status 
-				long count = (long) sessionFactory.getCurrentSession()
-						.createQuery("select count(*) from TMSTireShortDetails where status = :status "
-								+ "and orgId = :orgId")
-						.setParameter("status", status).setParameter("orgId", orgId).uniqueResult();
-				return count;
-			} else if (orgId != 0){
+			if (null != status && orgId != 0) {
+
+				if (status.equalsIgnoreCase(MyConstants.STATUS_INSTOCK) && sensorStatus == true) {
+					// For Org based on status
+					long count = (long) sessionFactory.getCurrentSession()
+							.createQuery("select count(*) from TMSTireShortDetails where status = :status "
+									+ "and orgId = :orgId and sensorId != 0")
+							.setParameter("status", status).setParameter("orgId", orgId).uniqueResult();
+					return count;
+				} else if (status.equalsIgnoreCase(MyConstants.STATUS_INSTOCK) && sensorStatus == false) {
+					// For Org based on status
+					long count = (long) sessionFactory.getCurrentSession()
+							.createQuery("select count(*) from TMSTireShortDetails where status = :status "
+									+ "and orgId = :orgId and sensorId = 0")
+							.setParameter("status", status).setParameter("orgId", orgId).uniqueResult();
+					return count;
+				} else {
+					// For Org based on status
+					long count = (long) sessionFactory.getCurrentSession()
+							.createQuery("select count(*) from TMSTireShortDetails where status = :status "
+									+ "and orgId = :orgId")
+							.setParameter("status", status).setParameter("orgId", orgId).uniqueResult();
+					return count;
+				}
+			} else if (orgId != 0) {
 				// All Tyres count based on Org
 				long count = (long) sessionFactory.getCurrentSession()
 						.createQuery("select count(*) from TMSTireShortDetails where orgId = :orgId")
 						.setParameter("orgId", orgId).uniqueResult();
 				return count;
+			} else if (null != status) {
+				// Based on status
+				if (status.equalsIgnoreCase(MyConstants.STATUS_INSTOCK) && sensorStatus == true) {
+					// For Org based on status
+					long count = (long) sessionFactory.getCurrentSession()
+							.createQuery("select count(*) from TMSTireShortDetails where status = :status "
+									+ "and sensorId != 0")
+							.setParameter("status", status).uniqueResult();
+					return count;
+				} else if (status.equalsIgnoreCase(MyConstants.STATUS_INSTOCK) && sensorStatus == false) {
+					// For Org based on status
+					long count = (long) sessionFactory.getCurrentSession()
+							.createQuery("select count(*) from TMSTireShortDetails where status = :status "
+									+ "and sensorId = 0")
+							.setParameter("status", status).uniqueResult();
+					return count;
+				} else {
+					long count = (long) sessionFactory.getCurrentSession()
+							.createQuery("select count(*) from TMSTireShortDetails where status = :status")
+							.setParameter("status", status).uniqueResult();
+					return count;
+				}
 			} else {
 				// For Sys Admin
 				long count = (long) sessionFactory.getCurrentSession()
@@ -1803,12 +2079,12 @@ public class MySQLDAOImpl implements MySQLDAO {
 		}
 		return 0;
 	}
-	
+
 	@Override
 	public long getTireServiceCount(long orgId) {
 
 		try {
-			if (orgId != 0){
+			if (orgId != 0) {
 				// All Tyres Services count based on Org
 				long count = (long) sessionFactory.getCurrentSession()
 						.createQuery("select count(*) from TMSTireService where orgId = :orgId")
@@ -1825,12 +2101,12 @@ public class MySQLDAOImpl implements MySQLDAO {
 		}
 		return 0;
 	}
-	
+
 	@Override
 	public long getTireInspectionsCount(long orgId) {
 
 		try {
-			if (orgId != 0){
+			if (orgId != 0) {
 				// All Tyres Services count based on Org
 				long count = (long) sessionFactory.getCurrentSession()
 						.createQuery("select count(*) from TMSTireInspection where orgId = :orgId")
@@ -1847,5 +2123,35 @@ public class MySQLDAOImpl implements MySQLDAO {
 		}
 		return 0;
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map<String, Integer> getTireSensorUIDsMap(List<String> sensorUIDs) {
+		Map<String, Integer> tireSensorMap = new HashMap<>();
+		try {
+			if (null != sensorUIDs && sensorUIDs.size() > 0) {
+				List<Object[]> rows = new ArrayList<>();
+
+				if ((rows = sessionFactory.getCurrentSession()
+						.createQuery("SELECT tireId, sensorUID FROM TMSTireView WHERE sensorUID in :sensorUIDs")
+						.setParameterList("sensorUIDs", sensorUIDs).list()) != null) {
+					for (Object[] row : rows) {
+						try {
+							tireSensorMap.put(row[1].toString(), Integer.parseInt(row[0].toString()));
+							// tyreCount.setVehId(Integer.parseInt(row[0].toString()));
+							// tyreCount.setTireCount(Integer.parseInt(row[1].toString()));
+							// vehTyreCount.add(tyreCount);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+
+		}
+		return tireSensorMap;
+	}
+
 }

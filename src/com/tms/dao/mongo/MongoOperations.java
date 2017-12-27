@@ -15,8 +15,7 @@ public interface MongoOperations {
 	public Response getLiveData(List<Long> vehIds);
 	
 	public Response getProblematicVehicles(List<Long> vehIds, double pressureMinValue, double pressureMaxValue,
-			double tempMinValue, double tempMaxValue);
+			double tempMinValue, double tempMaxValue, boolean needlist);
 	
-	public Response getProblematicVehCount(List<Long> vehIds, double pressureMinValue, double pressureMaxValue,
-			double tempMinValue, double tempMaxValue);
+	public Response getTempPressureData(List<Long> vehIds, boolean needlist);
 }

@@ -20,6 +20,9 @@ public class TMSSensor {
 	@Column(name = "SensorUID", columnDefinition = " VARCHAR(45) ", nullable = false, unique = true)
 	private String sensorUID;
 	
+	@Column(name = "RIMNo", columnDefinition = " VARCHAR(45) ", nullable = false)
+	private String rimNo;
+	
 	@Column(name = "TireId", columnDefinition=" int default 0 ", nullable = false)
 	private long tireId;
 	
@@ -90,6 +93,14 @@ public class TMSSensor {
 
 	public void setUpdatedDateTime(Date updatedDateTime) {
 		this.updatedDateTime = updatedDateTime;
+	}
+
+	public String getRimNo() {
+		return rimNo;
+	}
+
+	public void setRimNo(String rimNo) {
+		this.rimNo = rimNo;
 	}
 	
 	

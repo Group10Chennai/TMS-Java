@@ -10,6 +10,8 @@ public class Tyre {
 	
 	public double temp;
 	
+	public String sensorUID;
+	
 
 	public long getTyreId() {
 		return tyreId;
@@ -43,12 +45,19 @@ public class Tyre {
 		this.temp = temp;
 	}
 
+	public String getSensorUID() {
+		return sensorUID;
+	}
+
+	public void setSensorUID(String sensorUID) {
+		this.sensorUID = sensorUID;
+	}
+
 	@Override
 	public String toString() {
-		return "[tyreId=" + tyreId + ", position=" + position + ", pressure=" + pressure + ", temp=" + temp
-				+ "]";
+		return "Tyre [tyreId=" + tyreId + ", position=" + position + ", pressure=" + pressure + ", temp=" + temp
+				+ ", sensorUID=" + sensorUID + "]";
 	}
 	
-
 
 }

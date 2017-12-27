@@ -66,5 +66,11 @@ public class Response {
 	public void setCount(long count) {
 		this.count = count;
 	}
+
+	@Override
+	public String toString() {
+		return "Response [status=" + status + ", displayMsg=" + displayMsg + ", errorMsg=" + errorMsg + ", strResponse="
+				+ strResponse + ", count=" + count + ", result=" + result + "]";
+	}
 	
 }

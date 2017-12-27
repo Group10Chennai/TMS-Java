@@ -21,12 +21,24 @@ public class TMSUserBean {
 	
 	private long allTiresConfigVehCount;
 	
+	private long total_fleets;
+	
 	private long tireCount_all;
 	
 	private long tireCount_installed;
 	
 	private long tireCount_instock;
 	
+	private long tireCount_withoutSensor;
+	
+	public long getTireCount_withoutSensor() {
+		return tireCount_withoutSensor;
+	}
+
+	public void setTireCount_withoutSensor(long tireCount_withoutSensor) {
+		this.tireCount_withoutSensor = tireCount_withoutSensor;
+	}
+
 	private long tireCount_scraped;
 	
 	private long tireCount_services;
@@ -137,6 +149,14 @@ public class TMSUserBean {
 
 	public void setTireCount_inspections(long tireCount_inspections) {
 		this.tireCount_inspections = tireCount_inspections;
+	}
+
+	public long getTotal_fleets() {
+		return total_fleets;
+	}
+
+	public void setTotal_fleets(long total_fleets) {
+		this.total_fleets = total_fleets;
 	}
 
 	

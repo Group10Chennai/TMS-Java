@@ -2,6 +2,7 @@ package com.tms.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.tms.beans.Response;
 import com.tms.beans.VehicleTyreCount;
@@ -33,11 +34,13 @@ public interface MySQLDAO {
 	
 	public Response getAllUserVehDetails(String searchWord, List<Long> vehIds, int limit, int startIndex);
 	
-	public long getTireCountBasedOnStatus(String status, long orgId);
+	public long getTireCountBasedOnStatus(String status, boolean sensorStatus, long orgId);
 	
 	public long getTireServiceCount(long orgId);
 	
 	public long getTireInspectionsCount(long orgId);
+	
+	public Response processServiceDetails(TMSTireService existingService, TMSTireInspection inspection, TMSTire tire);
 	
 	// Add, Update & Delete Vehicles services
 	public List<TMSBasicVehicleDetails> getVehicles();
@@ -76,7 +79,7 @@ public interface MySQLDAO {
 	public TMSUserVehicleMapping getTMSUserVehicleMappingDetails(long vehId, long userId);
 
 	// RFID details services
-	public List<TMSRFID> getRFID(String status);
+	public Response getRFID(String status, String searchWord, int limit, int startIndex);
 
 	public TMSRFID getRFIDByRFIDUID(String RFIDUID);
 
@@ -89,7 +92,7 @@ public interface MySQLDAO {
 	public TMSRFID getRFIDByVehId(long vehId);
 
 	// Bluetooth Controller details services
-	public List<TMSBController> getBController(String status);
+	public Response getBController(String status, String searchWord, int limit, int startIndex);
 
 	public Response saveOrUpdateBController(TMSBController tmsBController);
 
@@ -102,7 +105,9 @@ public interface MySQLDAO {
 	public TMSBController getBCtrlByVehId(long vehId);
 
 	// Sensor
-	public List<TMSSensor> getSensors(String status, int limit, int startIndex);
+	public Response getSensors(String status, String searchWord, int limit, int startIndex);
+	
+	public long getSensorsCount(String status);
 
 	public Response saveOrUpdateSensor(TMSSensor tmsSensor);
 
@@ -116,6 +121,8 @@ public interface MySQLDAO {
 
 	
 	// Tire details services
+	public Map< String, Integer> getTireSensorUIDsMap(List<String> sensorUIDs);
+	
 	public List<TMSTire> getTiresByVehId(long vehId);
 
 	public List<TMSTireView> getTireViewDetials(long orgId, String status, int limit, int startIndex);

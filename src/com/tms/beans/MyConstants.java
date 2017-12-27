@@ -35,6 +35,12 @@ public class MyConstants {
 	public static String STATUS_INSTOCK = "InStock";
 	public static String STATUS_INSTALLED = "Installed";
 	public static String STATUS_SCRAPED = "Scraped";
+	public static String STATUS_WITHOUT_SENSOR = "WithoutSensor";
+	
+	public static String TEMP_PRESSURE_TYPE_GOOD = "Good";
+	
+	public static String TEMP_PRESSURE_TYPE_ALL = "All";
+	
 
 	public static String STATUS_ERROR = "Incorrent status. Status should be " + STATUS_INSTOCK + ", " + STATUS_INSTALLED
 			+ " or " + STATUS_SCRAPED;

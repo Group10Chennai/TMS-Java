@@ -847,7 +847,7 @@ public class TMSController {
 
 	@RequestMapping(value = "/Sensor/Add", method = RequestMethod.GET)
 	public @ResponseBody Response addSensor(@RequestParam(value = "sensorUID", required = false) String sensorUID,
-			HttpServletRequest request) {
+			@RequestParam(value = "rimNo", required = false) String rimNo, HttpServletRequest request) {
 		Response response = new Response();
 		response.setStatus(false);
 		try {
@@ -863,6 +863,15 @@ public class TMSController {
 						if (null == tmsSensor) {
 							tmsSensor = new TMSSensor();
 							tmsSensor.setSensorUID(sensorUID);
+							try {
+								if(null == rimNo || rimNo.equalsIgnoreCase("undefined") || rimNo.trim().length() == 0){
+									tmsSensor.setRimNo("0");
+								} else {
+									tmsSensor.setRimNo(rimNo);
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 							tmsSensor.setCreatedBy(loginUser.getUserId());
 							tmsSensor.setCreatedDateTime(new Date());
 							tmsSensor.setStatus(MyConstants.STATUS_INSTOCK);
@@ -895,7 +904,8 @@ public class TMSController {
 
 	@RequestMapping(value = "/Sensor/Update", method = RequestMethod.GET)
 	public @ResponseBody Response updateSensor(@RequestParam(value = "sensorId", required = false) Long sensorId,
-			@RequestParam(value = "sensorUID", required = false) String sensorUID, HttpServletRequest request) {
+			@RequestParam(value = "sensorUID", required = false) String sensorUID, 
+			@RequestParam(value = "rimNo", required = false) String rimNo, HttpServletRequest request) {
 		Response response = new Response();
 		response.setStatus(false);
 		try {
@@ -912,12 +922,24 @@ public class TMSController {
 					} else {
 
 						TMSSensor tmsSensor = mySQLService.getSensorBySensorUID(sensorUID);
-						if (null == tmsSensor) {
-
+						if(null != tmsSensor && tmsSensor.getSensorId() !=  sensorId){
+							// Sensor UID already exists
+							response.setDisplayMsg(MyConstants.SENSORUID__EXISTS);
+							response.setErrorMsg(sensorUID + " " + MyConstants.SENSORUID__EXISTS);
+						} else {
+							// Sensor UID not exists
 							tmsSensor = mySQLService.getSensorBySensorId(sensorId);
 							if (null != tmsSensor) {
 
 								tmsSensor.setSensorUID(sensorUID);
+								try {
+									if(null != rimNo && (! rimNo.equalsIgnoreCase("undefined")) 
+											&& rimNo.trim().length() > 0){
+										tmsSensor.setRimNo(rimNo);
+									}
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 								tmsSensor.setUpdatedDateTime(new Date());
 								response = mySQLService.saveOrUpdateSensor(tmsSensor);
 								if (response.isStatus()) {
@@ -927,13 +949,15 @@ public class TMSController {
 								}
 								return response;
 							} else {
-
 								response.setDisplayMsg(MyConstants.SENSOR_UPDATING_FAILED);
 								response.setErrorMsg(sensorId + " " + MyConstants.SENSORID_NOT_EXISTS);
 							}
+						}
+						if (null == tmsSensor || tmsSensor.getSensorId() ==  sensorId) {
+
+							
 						} else {
-							response.setDisplayMsg(MyConstants.SENSORUID__EXISTS);
-							response.setErrorMsg(sensorUID + " " + MyConstants.SENSORUID__EXISTS);
+							
 						}
 					}
 				} else {

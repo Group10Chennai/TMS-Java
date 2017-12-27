@@ -35,7 +35,7 @@ public class TMSTireService {
 	@Column(name = "VehId", columnDefinition = " int default 0 ", nullable = false)
 	private long vehId;
 	
-	@Column(name = "FittedDate", columnDefinition = " TIMESTAMP default CURRENT_TIMESTAMP", nullable = false)
+	@Column(name = "FittedDate", columnDefinition = " DATE", nullable = false)
 	private Date fittedDate;
 	
 	@Column(name = "KmsAtTyreFitted", columnDefinition = " int default 0 ", nullable = false)
@@ -44,7 +44,7 @@ public class TMSTireService {
 	@Column(name = "Location", columnDefinition = " VARCHAR(45) ", nullable = false)
 	private String location;
 	
-	@Column(name = "RemovalDate", columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP", nullable = true)
+	@Column(name = "RemovalDate", columnDefinition = "DATE", nullable = true)
 	private Date removalDate;
 	
 	@Column(name = "KmsAtTyreRemoved", columnDefinition = " int default 0 ", nullable = true)

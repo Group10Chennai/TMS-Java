@@ -2,6 +2,7 @@ package com.tms.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -167,21 +168,21 @@ public class MySQLServiceImpl implements MySQLService {
 	}
 
 	@Override
-	public List<TMSRFID> getRFID(String status) {
+	public Response getRFID(String status, String searchWord, int limit, int startIndex) {
 		
-		return mySQLDAO.getRFID(status);
+		return mySQLDAO.getRFID(status, searchWord, limit, startIndex);
 	}
 
 	@Override
-	public List<TMSBController> getBController(String status) {
+	public Response getBController(String status, String searchWord, int limit, int startIndex) {
 		
-		return mySQLDAO.getBController(status);
+		return mySQLDAO.getBController(status, searchWord, limit, startIndex);
 	}
 
 	@Override
-	public List<TMSSensor> getSensors(String status, int limit, int startIndex) {
+	public Response getSensors(String status, String searchWord, int limit, int startIndex) {
 		
-		return mySQLDAO.getSensors(status, limit, startIndex);
+		return mySQLDAO.getSensors(status, searchWord, limit, startIndex);
 	}
 
 	@Override
@@ -460,9 +461,9 @@ public class MySQLServiceImpl implements MySQLService {
 	}
 
 	@Override
-	public long getTireCountBasedOnStatus(String status, long orgId) {
+	public long getTireCountBasedOnStatus(String status, boolean sensorStatus, long orgId) {
 		
-		return mySQLDAO.getTireCountBasedOnStatus(status, orgId);
+		return mySQLDAO.getTireCountBasedOnStatus(status, sensorStatus, orgId);
 	}
 
 	@Override
@@ -475,6 +476,24 @@ public class MySQLServiceImpl implements MySQLService {
 	public long getTireInspectionsCount(long orgId) {
 		
 		return mySQLDAO.getTireInspectionsCount(orgId);
+	}
+
+	@Override
+	public long getSensorsCount(String status) {
+		
+		return mySQLDAO.getSensorsCount(status);
+	}
+
+	@Override
+	public Response processServiceDetails(TMSTireService existingService, TMSTireInspection inspection, TMSTire tire) {
+		
+		return mySQLDAO.processServiceDetails(existingService, inspection, tire);
+	}
+
+	@Override
+	public Map<String, Integer> getTireSensorUIDsMap(List<String> sensorUIDs) {
+		
+		return mySQLDAO.getTireSensorUIDsMap(sensorUIDs);
 	}
 
 }

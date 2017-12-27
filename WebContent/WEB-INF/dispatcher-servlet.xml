@@ -79,7 +79,7 @@
 	 	<!-- <property name="host" value="54.251.152.105:27017"/> --> <!-- Enable when running in local -->
 	 	<!-- <property name="host" value="172.31.22.44:27017"/> --> <!-- Enable it when deploying -->
 	 	<!-- <property name="host" value="localhost:27017"/> -->
-	 	<property name="host" value="172.16.0.151:27017"/>
+	 	<property name="host" value="${mongo.host}"/>
 	</bean>
     
 </beans>
